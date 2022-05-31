@@ -1,0 +1,6 @@
+# ignore sas list files
+*.lst
+# viper-run-sas uses .txt for LST file extension
+*.txt
+# ignore PDF files (e.g. scanlog.pdf)
+*.pdf
