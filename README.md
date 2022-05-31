@@ -1,3 +1,8 @@
-# VeraMedimol
+# Domino Data Lab Consultancy
 
-VeraMedimol is a process improvement project which contains a reference study using Veramed standards and a demo of specifications, programs, macros, etc.
+Setup repo for the Domino data lab consultancy work. Based off veramedimol.
+
+## TODOs
+
+- [ ] Clean repo, remove irrelevant documents
+- [ ] Create new R code
