@@ -1,3 +1,3 @@
-# Domino Pre-Access Setup
+# VeraMedimol
 
-Pre platform access setup repo. For files to be transferred onto domino upon access granted
+VeraMedimol is a process improvement project which contains a reference study using Veramed standards and a demo of specifications, programs, macros, etc.

@@ -1,0 +1,11 @@
+*.sas7bdat
+*.sas7bcat
+*.xpt
+*.rda
+*.rds
+*.RData
+*.xml
+*.csv
+*.tsv
+*.zip
+*.rar
