@@ -1,0 +1,3 @@
+# ignore SAS log files for test programs
+*_test.log
+*_test_*.log

@@ -1,0 +1,2 @@
+# ignore viper-run-sas SAS LST files (.txt) files from test progs
+*_test*.txt
