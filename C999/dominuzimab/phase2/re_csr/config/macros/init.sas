@@ -79,6 +79,8 @@
 *  16mar2022 | Stuart Malcolm  | #15 detect if running in VIPER batch mode
 * ----------------------------------------------------------------------------
 *  26mar2022 | Stuart Malcolm  | #26 additional vars (prog cat/type/name/etc)
+* ----------------------------------------------------------------------------
+*  01jun2022 | Stuart Malcolm  | change DELIM to Unix and fix hardcoded \
 \*****************************************************************************/
 
 %macro init;
@@ -102,8 +104,8 @@
    /* Local vars are not available ouside this macro */
    %local verasetup;
 
-   /* Define path delimeter for Windows. Change to / for unix */
-   %let __DELIM = %str(\);
+   /* Define path delimeter \ for Windows / for unix */
+   %let __DELIM = %str(/);
 
    /* Check for macro var _SASPROGRAMFILE. This parameter is only present in EG */
    %if %symexist(_SASPROGRAMFILE) %then %do;
@@ -171,7 +173,8 @@
    data _null_;
       length envmode $7;
 
-      fullpath = upcase(translate("&__full_path.", "", "'"));
+*      fullpath = upcase(translate("&__full_path.", "", "'"));
+      fullpath = translate("&__full_path.", "", "'");
       /* Set envmode based on current file path */
       * if the username is in the filepath then assume in DEV mode ;
       if find(fullpath, "&__DELIM.&sysuserid.&__DELIM", "i") ge 1 then envmode = "DEV";
@@ -190,7 +193,7 @@
   
 	   /* repath is e.g. z:\client\compund\study\re_name */
       /* All paths in reporting effort are relative to this */
-      path2    = "\" || strip(prodqc) || "&__DELIM." || strip(progtype);
+      path2    = "&__DELIM." || strip(prodqc) || "&__DELIM." || strip(progtype);
       repath = substr(fullpath, 1, index(fullpath, strip(path2))-1);
 
 	   /* Define the global variables */
@@ -227,7 +230,7 @@
    %* Verasetup is the Veramed standard setup program ;
    %* This does most of the initialisation heavy-lifting ;
    %* e.g. defines libnames, etc. ;
-   %let verasetup = &__env_runtime.\config\verasetup.sas;
+   %let verasetup = &__env_runtime.&__DELIM.config&__DELIM.verasetup.sas;
 
    %if %sysfunc(fileexist(%quote(&verasetup.))) %then %inc "&verasetup.";
    %else %put %str(DE)BUG: [Program: init.sas] Verasetup file does not exist. [verasetup: &verasetup].;;
