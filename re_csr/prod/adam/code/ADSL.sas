@@ -32,7 +32,8 @@ dm 'log;clear;';
 \*****************************************************************************/
 
 *********;
-%init;
+** Setup environment including libraries for this reporting effort;
+%include "!DOMINO_WORKING_DIR/re_csr/config/domino.sas";
 *********;
 
 **** USER CODE FOR ALL DATA PROCESSING **;
@@ -345,7 +346,7 @@ data adsl;
   avgdd = round(cumdose / trtdurd,0.1);
 run;
 
-data adamw.adsl (label = "Subject-Level Analysis Dataset");
+data adam.adsl (label = "Subject-Level Analysis Dataset");
   retain &keepvars.;
   set adsl (keep = &keepvars.);
 
