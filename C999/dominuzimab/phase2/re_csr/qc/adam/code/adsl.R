@@ -11,18 +11,73 @@ library(tidyverse)
 library(admiral)
 
 # Data
-dm <- admiral.test::admiral_dm %>% convert_blanks_to_na()
-ex <- admiral.test::admiral_ex %>% convert_blanks_to_na()
-ds <- admiral.test::admiral_ds %>% convert_blanks_to_na()
-sv <- admiral.test::admiral_sv %>% convert_blanks_to_na()
-qs <- admiral.test::admiral_qs %>% convert_blanks_to_na()
-vs <- admiral.test::admiral_vs %>% convert_blanks_to_na()
-# sc <- admiral.test::admiral_sc %>% convert_blanks_to_na()
-mh <- admiral.test::admiral_mh %>% convert_blanks_to_na()
+dm <- dm %>% convert_blanks_to_na()
+ex <- ex %>% convert_blanks_to_na()
+ds <- ds %>% convert_blanks_to_na()
+sv <- sv %>% convert_blanks_to_na()
+qs <- qs %>% convert_blanks_to_na()
+vs <- vs %>% convert_blanks_to_na()
+sc <- sc %>% convert_blanks_to_na()
+mh <- mh %>% convert_blanks_to_na()
 
 # Metadata, labels & order
 ADSL_vars <- c(
-  SIT
+  STUDYID = "Study Identifier",
+  USUBJID = "Unique Subject Identifier",
+  SUBJID = "Subject Identifier for the Study",
+  SITEID = "Study Site Identifier",
+  SITEGR1 = "Pooled Site Group 1",
+  ARM = "Description of Planned Arm",
+  TRT01P = "Planned Treatment for Period 01",
+  TRT01PN = "Planned Treatment for Period 01 (N)",
+  TRT01A = "Actual Treatment for Period 01",
+  TRT01AN = "Actual Treatment for Period 01 (N)",
+  RFSTDTC = "Subject Reference Start Date/Time",
+  RFENDTC = "Subject Reference End Date/Time",
+  RFXSTDTC = "Date/Time of First Study Treatment",
+  RFXENDTC = "Date/Time of Last Study Treatment",
+  LSTEXDTC = "Date/Time of Last End of Exposure",
+  EOSSTT = "End of Study Status",
+  EOSDT = "End of Study Date",
+  EOSDY = "End of Study Day",
+  DCSREAS = "Reason for Discontinuation from Study",
+  DCSREAPL = "Reason for Disc from Study (Pooled)",
+  RANDDT = "Date of Randomization",
+  TRTSDT = "Date of First Exposure to Treatment",
+  TRTEDT = "Date of Last Exposure to Treatment",
+  TRTDURD = "Total Treatment Duration (Days)",
+  CUMDOSE = "Cumulative Dose (as planned)",
+  AVGDD = "Avg Daily Dose (as planned)",
+  AGE = "Age",
+  AGEGR1 = "Pooled Age Group 1",
+  AGEGR1N = "Pooled Age Group 1 (N)",
+  AGEU = "Age Units",
+  RACE = "Race",
+  RACEN = "Race (N)",
+  SEX = "Sex",
+  ETHNIC = "Ethnicity",
+  RANDFL = "Randomized Population Flag",
+  ITTFL = "Intent-To-Treat Population Flag",
+  SAFFL = "Safety Population Flag",
+  EFFFL = "Efficacy Population Flag",
+  COMPLFL = "Completers Population Flag",
+  COMP8FL = "Completers of Week 8 Population Flag",
+  COMP16FL = "Completers of Week 16 Population Flag",
+  COMP26FL = "Completers of Week 26 Population Flag",
+  DTHFL = "Subject Death Flag",
+  DTHDTC = "Date/Time of Death",
+  DTHDT = "Date of Death",
+  BMIBL = "Baseline BMI (kg/m2)",
+  BMIGR1 = "Pooled Baseline BMI Group 1",
+  HEIGHTBL = "Baseline Height (cm)",
+  WEIGHTBL = "Baseline Weight (kg)",
+  EDLEVEL = "Years of Education Completed",
+  DISONDT = "Date of Disease Onset",
+  VIS1DT = "Date of Visit 1",
+  DURDISM = "Duration of Disease (Months)",
+  DURDSGR1 = "Pooled Disease Duration Group 1",
+  VISNUMEN = "End of Trt Visit (Vis 12 or Early Term.)",
+  BLDSEV = "Baseline Disease Severity (MMSE)"
 ) 
 
 # Codelists
