@@ -31,8 +31,10 @@
 * - DOMINO_WORKING_DIR
 * - DCUTDTC
 *
-* Output files:                                                   
-* - none
+* Outputs:                                                   
+* - global variables defined
+* - SAS Libnames defined
+* - sasautos path set for shared macros
 *
 * Macros: 
 * - none
@@ -105,6 +107,12 @@
   libname TFL   "/mnt/data/TFL";
   libname TFLQC "/mnt/data/TFLQC";
 %end;
+
+* ------------------------------------------------------------------;
+* Set SASAUTOS to search for shared macros ;
+* ------------------------------------------------------------------;
+FileName SASmacro "/mnt/code/share/macros" ;
+options append=(sasautos=(SASmacro) ) ;
 
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;

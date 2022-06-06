@@ -1,6 +1,4 @@
-dm 'out;clear;';
-dm 'log;clear;';
- /*****************************************************************************\
+/*****************************************************************************\
 *        O                                                                      
 *       /                                                                       
 *  O---O     _  _ _  _ _  _  _|                                                 
@@ -29,11 +27,12 @@ dm 'log;clear;';
 *  05-May-2022   | Dianne Weatherall   | Update RACEN to be 6 for american indian
 *  05-May-2022   | Dianne Weatherall   | Updated completion flags to use EOSDT instead of TRTEDT
 *  05-May-2022   | Dianne Weatherall   | Updated VISNUMEN to have a maximum of 12
+*  06-Jun-2022   | Stuart Malcolm      | changed init to call domino setup
 \*****************************************************************************/
 
 *********;
 ** Setup environment including libraries for this reporting effort;
-%include "!DOMINO_WORKING_DIR/re_csr/config/domino.sas";
+%include "!DOMINO_WORKING_DIR/config/domino.sas";
 *********;
 
 **** USER CODE FOR ALL DATA PROCESSING **;
