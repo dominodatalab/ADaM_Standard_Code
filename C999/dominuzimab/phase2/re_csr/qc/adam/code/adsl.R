@@ -11,6 +11,14 @@ library(tidyverse)
 library(admiral)
 
 # Data
+
+address = paste0("/mnt/imported/data/snapshots/SDTM/SDTM_", Sys.getenv("DCUTDTC"))
+datasets = c("dm","ex","ds","ds","sv","qs","vs","sc","mh")
+
+for (ds in datasets){
+  assign(ds, haven::read_sas(paste0(address,"/",ds,".sas7bdat")))
+}
+
 dm <- dm %>% convert_blanks_to_na()
 ex <- ex %>% convert_blanks_to_na()
 ds <- ds %>% convert_blanks_to_na()
@@ -111,6 +119,11 @@ DCSREAPL_FMT <- c("ADVERSE EVENT" = "Adverse Event",
 )
 
 # User defined functions
+
+#Add label
+add_label <- function(.data) {
+  
+}
 
 ## SITEGR1 Derivation
 add_sitegr1 <- function(.data) {
@@ -374,5 +387,7 @@ ADSL <- dm %>%
       ungroup %>%
       distinct,
     by = "USUBJID"
-  )
+  ) %>%
+  select(!!!names(ADSL_vars)) %>%
+  
 
