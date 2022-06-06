@@ -13,10 +13,10 @@ library(admiral)
 # Data
 
 address = paste0("/mnt/imported/data/snapshots/SDTM/SDTM_", Sys.getenv("DCUTDTC"))
-datasets = c("dm","ex","ds","ds","sv","qs","vs","sc","mh")
+datasets = c("dm","ex","ds","sv","qs","vs","sc","mh")
 
-for (ds in datasets){
-  assign(ds, haven::read_sas(paste0(address,"/",ds,".sas7bdat")))
+for (dset_name in datasets){
+  assign(dset_name, haven::read_sas(paste0(address,"/",dset_name,".sas7bdat")))
 }
 
 dm <- dm %>% convert_blanks_to_na()
@@ -119,11 +119,6 @@ DCSREAPL_FMT <- c("ADVERSE EVENT" = "Adverse Event",
 )
 
 # User defined functions
-
-#Add label
-add_label <- function(.data) {
-  
-}
 
 ## SITEGR1 Derivation
 add_sitegr1 <- function(.data) {
@@ -339,12 +334,12 @@ ADSL <- dm %>%
   # VS baseline vals
   add_baseline_vs %>%
   # years of education
-  # left_join(
-  #   filter(sc, SCTESTCD == "EDLEVEL") %>%
-  #     select(USUBJID, EDLEVEL=SCSTRESN) %>%
-  #     distinct,
-  #   by = "USUBJID"
-  # ) %>% 
+  left_join(
+    filter(sc, SCTESTCD == "EDLEVEL") %>%
+      select(USUBJID, EDLEVEL=SCSTRESN) %>%
+      distinct,
+    by = "USUBJID"
+  ) %>%
   # Date of disease onset
   left_join(
     filter(mh, MHCAT == "PRIMARY DIAGNOSIS") %>%
@@ -388,6 +383,11 @@ ADSL <- dm %>%
       distinct,
     by = "USUBJID"
   ) %>%
-  select(!!!names(ADSL_vars)) %>%
+  select(!!!names(ADSL_vars))
   
+# Labels
 
+walk2(names(ADSL_vars), ADSL_vars, ~ {attr(ADSL[[.x]], "label") <<- .y})
+
+# export
+haven::write_xpt(ADSL, "/mnt/data/ADAMQC/adsl.xpt")
