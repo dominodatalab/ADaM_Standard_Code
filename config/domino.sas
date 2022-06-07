@@ -59,6 +59,14 @@
 %global __PROTOCOL;      * Protocol identifier e.g H2QMCLZZT; 
 %global __PROJECT_TYPE ; * project type: SDTM | ADAM | TFL ;
 
+* other globals exported by setup;
+%global __prog_path;     * full path to the program being run;
+%global __prog_name;     * filename (without extension) of program;
+%global __prog_ext;      * extension of program (usuall sas);
+
+%global __full_path;     * full path and filename ;
+%global __runmode;       * INTERACTIVE or BATCH (or UNKNOWN);
+
 * grab the environment varaibles that we need to create pathnames;
 %let __WORKING_DIR  = %sysget(DOMINO_WORKING_DIR);
 %let __PROJECT_NAME = %sysget(DOMINO_PROJECT_NAME);
@@ -111,8 +119,52 @@
 * ------------------------------------------------------------------;
 * Set SASAUTOS to search for shared macros ;
 * ------------------------------------------------------------------;
-FileName SASmacro "/mnt/code/share/macros" ;
-options append=(sasautos=(SASmacro) ) ;
+options
+  MAUTOSOURCE
+  MAUTOLOCDISPLAY 
+  sasautos=("/mnt/code/share/macros",SASAUTOS) ;
+
+* ------------------------------------------------------------------;
+* Determine if we are running Interactive or Batch ;
+* ------------------------------------------------------------------;
+
+* default position is that we dont know how program is running;
+%let __runmode=UNKNOWN;
+
+%* Check for macro var _SASPROGRAMFILE. only present in SAS Studio ;
+   %if %symexist(_SASPROGRAMFILE) %then %do;
+      %let __full_path = %str(&_SASPROGRAMFILE.);
+      %let __runmode=INTERACTIVE;
+      %put %str(TR)ACE: (domino.sas) Running in SAS Studio.;
+   %end;
+
+%* Check for Operating System parameter SYSIN. This parameter indicates batch execution ;
+   %else %if %quote(%sysfunc(getoption(sysin))) ne %str() %then %do;
+      %let __full_path = %quote(%sysfunc(getoption(sysin)));
+      %let __runmode=BATCH;
+      %put %str(TR)ACE: (domino.sas) Running in BATCH SAS.;
+   %end;
+
+%if &__full_path eq %str() %then %put %str(ER)ROR: Cannot determine program name;
+
+* ------------------------------------------------------------------;
+* get program name, path and extension
+* ------------------------------------------------------------------;
+
+%local filename;
+%* scan from right to left for first backslash. ;
+%* everything to the right of that slash is filename with extension. ;
+%let filename = %scan(&__full_path, -1, /);
+
+%* find the numeric position of the filename. ;
+%* everything to up to that point (minus 1) is the folder. ;
+%let __prog_path      ​= %substr(&__full_path, 1, %index(&__full_path, &filename) - 1);
+
+%* isolate filename as everything up to but not including the period. ;
+%let __prog_name = %scan(&filename, 1, .);
+
+%* everything after the period is the extension. ;
+%let __prog_ext = %scan(&__full_path, 2, .);
 
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;
@@ -125,6 +177,9 @@ options append=(sasautos=(SASmacro) ) ;
 %put TRACE: (domino.sas) [__DCUTDTC = &__DCUTDTC.];
 %put TRACE: (domino.sas) [__PROTOCOL = &__PROTOCOL.];
 %put TRACE: (domino.sas) [__PROJECT_TYPE = &__PROJECT_TYPE.];
+%put TRACE: (domino.sas) [__prog_path = &__prog_path.];
+%put TRACE: (domino.sas) [__prog_name = &__prog_name.];
+%put TRACE: (domino.sas) [__prog_ext = &__prog_ext.];
 
 * List all the libraries that are currently defined;
 libname _all_ list;
