@@ -53,7 +53,7 @@ run;
 
 /* Create total column data and sort */
 data adsltot;
-    set adamw.adsl adamw.adsl (in = intot);
+    set adam.adsl adam.adsl (in = intot);
     if intot then trt01an = 99;
 run;
 proc sort data = adsltot out = adsltot_s;
@@ -110,7 +110,7 @@ proc sql;
 quit;
 
 /* Transpose into final dddataset */
-proc transpose prefix = trt_ data = statcat out = tflw.&dddatanam (drop = _name_);
+proc transpose prefix = trt_ data = statcat out = tfl.&dddatanam (drop = _name_);
     by page flagord flaglab;
     id trt01an;
     var npp;
@@ -141,7 +141,7 @@ footnote3 justify=l "The safety population includes all randomized subjects know
 footnote4 justify=l "The efficacy population includes all subjects in the safety population who also have at least one post-baseline ADAS-cog and CIBIC+ assessment. " ;
 footnote5 ;
 footnote6 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
-proc report data = tflw.&dddatanam split = '~'
+proc report data = tfl.&dddatanam split = '~'
             style = rtfCourier
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
@@ -178,6 +178,6 @@ ods rtf close;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%scanlog;
+**%scanlog;
 ********;
 
