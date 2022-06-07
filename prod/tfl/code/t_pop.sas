@@ -143,7 +143,7 @@ run;
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods pdf file = "/mnt/artifacts/results/&outname..pdf" ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 /* Titles and footnotes for PROC REPORT */
 title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
@@ -158,7 +158,7 @@ footnote4 justify=l "The efficacy population includes all subjects in the safety
 footnote5 ;
 footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &_SASPROGRAMFILE , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = tfl.&dddatanam split = '~'
-            style = rtfCourier
+            style = pdfstyle
             style(report) = {width=100% font_face = 'courier new'} 
             style(column) = {asis = on just = l}
             style(header) = {just = c borderbottomcolor = black borderbottomwidth = 2 bordertopcolor = black bordertopwidth = 2}
