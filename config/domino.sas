@@ -148,7 +148,7 @@ options
 %if &__full_path eq %str() %then %put %str(ER)ROR: Cannot determine program name;
 
 * ------------------------------------------------------------------;
-* get program name, path and extension
+* get program name, path and extension ;
 * ------------------------------------------------------------------;
 
 %local filename;
@@ -158,13 +158,13 @@ options
 
 %* find the numeric position of the filename. ;
 %* everything to up to that point (minus 1) is the folder. ;
-%let __prog_path      ​= %substr(&__full_path, 1, %index(&__full_path, &filename) - 1);
+%let __prog_path= %substr(&__full_path., 1, %index(&__full_path., &filename.) - 1);
 
 %* isolate filename as everything up to but not including the period. ;
 %let __prog_name = %scan(&filename, 1, .);
 
 %* everything after the period is the extension. ;
-%let __prog_ext = %scan(&__full_path, 2, .);
+%let __prog_ext = %scan(&filename, 2, .);
 
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;
