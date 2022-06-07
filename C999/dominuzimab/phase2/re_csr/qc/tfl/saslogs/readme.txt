@@ -1,1 +1,0 @@
-file to fill empty folder for Git Storage
