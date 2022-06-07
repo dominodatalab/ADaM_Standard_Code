@@ -120,6 +120,26 @@ data _NULL_;
     call symput(cats('N_', trt01an), strip(put(bign,5.)));
 run; 
 
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
