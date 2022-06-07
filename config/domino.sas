@@ -111,7 +111,10 @@
 * ------------------------------------------------------------------;
 * Set SASAUTOS to search for shared macros ;
 * ------------------------------------------------------------------;
-options sasautos=("/mnt/code/share/macros",SASAUTOS) ;
+options
+  MAUTOSOURCE
+  MAUTOLOCDISPLAY 
+  sasautos=("/mnt/code/share/macros",SASAUTOS) ;
 
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;

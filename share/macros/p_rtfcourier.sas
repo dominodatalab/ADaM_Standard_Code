@@ -29,7 +29,7 @@
 *
 \*****************************************************************************/
 
-%macro p_rtfCourier();
+%macro p_rtfcourier();
 
   proc template;
     define style rtfCourier;
@@ -87,4 +87,4 @@
     end;
   run;
 
-%mend p_rtfCourier;
+%mend p_rtfcourier;

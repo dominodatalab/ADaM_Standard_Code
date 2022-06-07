@@ -122,11 +122,11 @@ data _NULL_;
     call symput(cats('N_', trt01an), strip(put(bign,5.)));
 run; 
 
-%p_rtfCourier();
+%p_rtfcourier();
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "/mnt/artifacts/results/&outname..rtf" style = rtfCourier ;
+ods rtf file = "/mnt/artifacts/results/c&outname..rtf" style = rtfCourier ;
 ods escapechar = '|';
 
 /* Titles and footnotes for PROC REPORT */
