@@ -345,7 +345,7 @@ data adsl;
   avgdd = round(cumdose / trtdurd,0.1);
 run;
 
-data adam.adsl (label = "Subject-Level Analysis Dataset");
+data adamqc.adsl (label = "Subject-Level Analysis Dataset");
   retain &keepvars.;
   set adsl (keep = &keepvars.);
 
