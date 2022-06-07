@@ -126,9 +126,8 @@ run;
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "/mnt/artifacts/results/c&outname..rtf" style = rtfCourier ;
+ods rtf file = "/mnt/artifacts/results/&outname..rtf" style = rtfCourier ;
 ods escapechar = '|';
-
 /* Titles and footnotes for PROC REPORT */
 title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
 title2 justify=l "Population: All subjects" ;
