@@ -412,4 +412,4 @@ ADSL <- dm %>%
 walk2(names(ADSL_vars), ADSL_vars, ~ {attr(ADSL[[.x]], "label") <<- .y})
 
 # export
-haven::write_xpt(ADSL, "/mnt/data/ADAMQC/adsl.xpt")
+haven::write_xpt(ADSL, "/mnt/data/ADAM/adsl.xpt")
