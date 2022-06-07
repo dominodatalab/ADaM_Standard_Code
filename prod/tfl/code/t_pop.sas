@@ -120,11 +120,30 @@ data _NULL_;
     call symput(cats('N_', trt01an), strip(put(bign,5.)));
 run; 
 
-%p_rtfcourier();
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "/mnt/artifacts/results/&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 /* Titles and footnotes for PROC REPORT */
 title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
@@ -139,8 +158,8 @@ footnote4 justify=l "The efficacy population includes all subjects in the safety
 footnote5 ;
 footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &_SASPROGRAMFILE , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = tfl.&dddatanam split = '~'
-            style = rtfCourier
-            style(report) = {width=100%} 
+            style = pdfstyle
+            style(report) = {width=100% font_face = 'courier new'} 
             style(column) = {asis = on just = l}
             style(header) = {just = c borderbottomcolor = black borderbottomwidth = 2 bordertopcolor = black bordertopwidth = 2}
             ;
@@ -170,7 +189,7 @@ proc report data = tfl.&dddatanam split = '~'
 
             
     run;
-ods rtf close;
+ods pdf close;
 
 **** END OF USER DEFINED CODE **;
 
