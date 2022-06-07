@@ -120,11 +120,10 @@ data _NULL_;
     call symput(cats('N_', trt01an), strip(put(bign,5.)));
 run; 
 
-%p_rtfcourier();
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "/mnt/artifacts/results/&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" ;
 ods escapechar = '|';
 /* Titles and footnotes for PROC REPORT */
 title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
@@ -140,7 +139,7 @@ footnote5 ;
 footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &_SASPROGRAMFILE , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = tfl.&dddatanam split = '~'
             style = rtfCourier
-            style(report) = {width=100%} 
+            style(report) = {width=100% font_face = 'courier new'} 
             style(column) = {asis = on just = l}
             style(header) = {just = c borderbottomcolor = black borderbottomwidth = 2 bordertopcolor = black bordertopwidth = 2}
             ;
@@ -170,7 +169,7 @@ proc report data = tfl.&dddatanam split = '~'
 
             
     run;
-ods rtf close;
+ods pdf close;
 
 **** END OF USER DEFINED CODE **;
 
