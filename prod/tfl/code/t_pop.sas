@@ -126,7 +126,7 @@ run;
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods rtf file = "/mnt/artifacts/results/&outname..rtf" style = rtfCourier ;
 ods escapechar = '|';
 
 /* Titles and footnotes for PROC REPORT */
