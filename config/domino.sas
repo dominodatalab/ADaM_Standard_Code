@@ -111,8 +111,7 @@
 * ------------------------------------------------------------------;
 * Set SASAUTOS to search for shared macros ;
 * ------------------------------------------------------------------;
-FileName SASmacro "/mnt/code/share/macros" ;
-options append=(sasautos=(SASmacro) ) ;
+options sasautos=("/mnt/code/share/macros",SASAUTOS) ;
 
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;
