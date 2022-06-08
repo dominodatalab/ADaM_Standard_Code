@@ -1,13 +1,11 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : adtte.sas
 * Purpose              : Create ADTTE dataset
@@ -15,7 +13,7 @@ dm 'log;clear;';
 * DESCRIPTION                                                    
 *                                                                   
 * Input files:  ADAM.ADAE
-*				ADaM.ADSL
+*               ADaM.ADSL
 *                                                                   
 * Output files: ADaM.ADTTE 
 *                                                                 
@@ -77,30 +75,30 @@ data adtte;
   * Event occurred;
   if (cq01nam eq "DERMATOLOGIC EVENTS") then do;
     adt      = astdt;
-	cnsr     = 0;
-	evntdesc = "Dermatologic event occurred";
+        cnsr     = 0;
+        evntdesc = "Dermatologic event occurred";
   end;
   * Event did not occur;
   else if (cq01nam ne "DERMATOLOGIC EVENTS") then do;
     if (dthdt ne .)      then do;
       adt      = dthdt;
-	  evntdesc = "Death";
-	end;
-	else if (eosdt ne .) then do;
+          evntdesc = "Death";
+        end;
+        else if (eosdt ne .) then do;
       adt      = eosdt;
-	  if (eosstt eq "DISCONTINUED")   then evntdesc = "Early terminated without dermatologic event";
-	  else if (eosstt eq "COMPLETED") then evntdesc = "Completed study without dermatologic event";
-	end;
-	else put "Check: " usubjid= ;
-	cnsr = 1;
-	if (dthdt ne .)      then cnsdtdsc = "Death";
-	else if (eosdt ne .) then cnsdtdsc = "End of study date";
+          if (eosstt eq "DISCONTINUED")   then evntdesc = "Early terminated without dermatologic event";
+          else if (eosstt eq "COMPLETED") then evntdesc = "Completed study without dermatologic event";
+        end;
+        else put "Check: " usubjid= ;
+        cnsr = 1;
+        if (dthdt ne .)      then cnsdtdsc = "Death";
+        else if (eosdt ne .) then cnsdtdsc = "End of study date";
   end;
 
   * ADY;
   if (trtsdt ne .) and (adt ne .) then do;
     if (adt ge trtsdt)      then ady = adt - trtsdt + 1;
-	else if (adt lt trtsdt) then ady = adt - trtsdt;
+        else if (adt lt trtsdt) then ady = adt - trtsdt;
   end;
 
   * PARAMCD, PARAM;
@@ -161,5 +159,5 @@ run;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+*%s_scanlog;
 ********;
