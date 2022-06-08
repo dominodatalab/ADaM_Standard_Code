@@ -31,7 +31,8 @@
 
 
 *********;
-%init;
+** Setup environment including libraries for this reporting effort;
+%include "!DOMINO_WORKING_DIR/config/domino.sas";
 *********;
 
 
