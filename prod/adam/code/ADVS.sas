@@ -1,35 +1,33 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : advs.sas
 * Purpose              : Create ADVS dataset
 * ____________________________________________________________________________
-* DESCRIPTION                                                    
-*                                                                   
+* DESCRIPTION
+*
 * Input files:  SDTM.VS
-*				ADaM.ADSL
-*                                                                   
-* Output files: ADaM.ADVS 
-*                                                                 
-* Macros:       None                                                       
-*                                                                   
-* Assumptions:                                                    
-*                                                                   
+*               ADaM.ADSL
+*
+* Output files: ADaM.ADVS
+*
+* Macros:       None
+*
+* Assumptions:
+*
 * ____________________________________________________________________________
-* PROGRAM HISTORY                                                         
-*  12APR2022 |  Dianne Weatherall   |  Original  
-* ---------------------------------------------------------------------------- 
+* PROGRAM HISTORY
+*  12APR2022 |  Dianne Weatherall   |  Original
+* ----------------------------------------------------------------------------
 \*****************************************************************************/
 
-    
+
 *********;
 %init;
 *********;
@@ -37,7 +35,7 @@ dm 'log;clear;';
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 
-%let keepvars = STUDYID USUBJID SUBJID SITEID TRTA TRTAN VSSTAT VSLOC ADT ADY VISIT VISITNUM AVISIT AVISITN ATPT ATPTN 
+%let keepvars = STUDYID USUBJID SUBJID SITEID TRTA TRTAN VSSTAT VSLOC ADT ADY VISIT VISITNUM AVISIT AVISITN ATPT ATPTN
                 PARAM PARAMCD PARAMN AVAL BASE BASETYPE CHG ABLFL ANL01FL;
 
 * Get variables from ADSL;
@@ -119,12 +117,12 @@ data advspar2;
 
   select (paramcd);
     when ("SYSBP")     paramn = 1;
-	when ("DIABP")     paramn = 2;
-	when ("PULSE")     paramn = 3;
-	when ("TEMP")      paramn = 4;
-	when ("WEIGHT")    paramn = 5;
-	when ("HEIGHT")    paramn = 6;
-	otherwise put "Check: " paramcd=;
+        when ("DIABP")     paramn = 2;
+        when ("PULSE")     paramn = 3;
+        when ("TEMP")      paramn = 4;
+        when ("WEIGHT")    paramn = 5;
+        when ("HEIGHT")    paramn = 6;
+        otherwise put "Check: " paramcd=;
   end;
 run;
 
@@ -150,9 +148,9 @@ data eot2;
   if (lvotfl eq "") then output;
   else if (lvotfl eq "Y") then do;
     output;
-	avisitn = 601;
-	avisit  = "End of treatment";
-	output;
+        avisitn = 601;
+        avisit  = "End of treatment";
+        output;
   end;
 run;
 
@@ -240,7 +238,7 @@ data adamw.advs (label = "Vital Signs Analysis Dataset");
     PARAMN   = "Parameter (N)"
     AVAL     = "Analysis Value"
     BASE     = "Baseline Value"
-	BASETYPE = "Baseline Type"
+        BASETYPE = "Baseline Type"
     CHG      = "Change from Baseline"
     ABLFL    = "Baseline Record Flag"
     ANL01FL  = "Analysis Flag 01"
@@ -251,5 +249,5 @@ run;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+*%s_scanlog;
 ********;
