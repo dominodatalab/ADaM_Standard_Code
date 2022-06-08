@@ -1,35 +1,33 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : adqsnpi.sas
 * Purpose              : Create ADQSNPI dataset
 * ____________________________________________________________________________
-* DESCRIPTION                                                    
-*                                                                   
+* DESCRIPTION
+*
 * Input files:  SDTM.QS
-*				ADaM.ADSL
-*                                                                   
-* Output files: ADaM.ADQSNPI 
-*                                                                 
-* Macros:       None                                                       
-*                                                                   
-* Assumptions:                                                    
-*                                                                   
+*               ADaM.ADSL
+*
+* Output files: ADaM.ADQSNPI
+*
+* Macros:       None
+*
+* Assumptions:
+*
 * ____________________________________________________________________________
-* PROGRAM HISTORY                                                         
-*  31MAY2022 |  Dianne Weatherall   |  Original  
-* ---------------------------------------------------------------------------- 
+* PROGRAM HISTORY
+*  31MAY2022 |  Dianne Weatherall   |  Original
+* ----------------------------------------------------------------------------
 \*****************************************************************************/
 
-    
+
 *********;
 %init;
 *********;
@@ -37,7 +35,7 @@ dm 'log;clear;';
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 
-%let keepvars = STUDYID SITEID USUBJID QSSEQ ITTFL EFFFL TRTP TRTPN ADT ADY ARNDY VISIT VISITNUM AVISIT AVISITN 
+%let keepvars = STUDYID SITEID USUBJID QSSEQ ITTFL EFFFL TRTP TRTPN ADT ADY ARNDY VISIT VISITNUM AVISIT AVISITN
                 PARAM PARAMCD PARAMN AVAL BASE CHG DTYPE AWRANGE AWTARGET AWTDIFF AWLO AWHI AWU ABLFL ANL01FL;
 
 * Create dataset with visit windows;
@@ -184,7 +182,7 @@ proc univariate data = qstarg noprint;
   where (paramcd eq "NPTOT" and anl01fl eq "Y" and avisitn ge 5 and avisitn le 12);
   output out = mean
     n    = n
-	mean = mean
+        mean = mean
   ;
 run;
 
@@ -243,11 +241,11 @@ data qsbase2;
   set qsbase1;
   if (paramcd eq "NPTOT") and (ablfl eq "Y") then do;
     output;
-	paramcd = "NPTOTMN";
-	param   = "Mean NPI-X (9) Total (Week 4 to 24)";
-	paramn  = 14;
-	dtype   = "AVERAGE";
-	output;
+        paramcd = "NPTOTMN";
+        param   = "Mean NPI-X (9) Total (Week 4 to 24)";
+        paramn  = 14;
+        dtype   = "AVERAGE";
+        output;
   end;
   else output;
 run;
@@ -330,5 +328,5 @@ run;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+*%s_scanlog;
 ********;
