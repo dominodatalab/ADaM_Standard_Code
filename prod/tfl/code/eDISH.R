@@ -31,7 +31,7 @@ library(tidyverse)
 library(haven)
 
 #--------------------------- set working directory -----------------------------
-setwd("G:/.shortcut-targets-by-id/1yMsHxw9Fsin07zuRndKkciO4l6VibyAh/Sarah Robson/R Projects/Domino")
+setwd("/mnt/data/adam")
 
 #------------------------------- read in data ----------------------------------
 adlbhy <- read_sas("adlbhy.sas7bdat")
