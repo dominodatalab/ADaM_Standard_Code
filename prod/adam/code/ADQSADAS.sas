@@ -1,35 +1,33 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : adqsadas.sas
 * Purpose              : Create ADQSADAS dataset
 * ____________________________________________________________________________
-* DESCRIPTION                                                    
-*                                                                   
+* DESCRIPTION
+*
 * Input files:  SDTM.QS
-*				ADaM.ADSL
-*                                                                   
-* Output files: ADaM.ADQSADAS 
-*                                                                 
-* Macros:       None                                                       
-*                                                                   
-* Assumptions:                                                    
-*                                                                   
+*               ADaM.ADSL
+*
+* Output files: ADaM.ADQSADAS
+*
+* Macros:       None
+*
+* Assumptions:
+*
 * ____________________________________________________________________________
-* PROGRAM HISTORY                                                         
-*  23MAY2022 |  Dianne Weatherall   |  Original  
-* ---------------------------------------------------------------------------- 
+* PROGRAM HISTORY
+*  23MAY2022 |  Dianne Weatherall   |  Original
+* ----------------------------------------------------------------------------
 \*****************************************************************************/
 
-    
+
 *********;
 %init;
 *********;
@@ -37,7 +35,7 @@ dm 'log;clear;';
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 
-%let keepvars = STUDYID SITEID USUBJID ITTFL EFFFL TRTP TRTPN QSSEQ ADT ADY ARNDY VISIT VISITNUM AVISIT AVISITN 
+%let keepvars = STUDYID SITEID USUBJID ITTFL EFFFL TRTP TRTPN QSSEQ ADT ADY ARNDY VISIT VISITNUM AVISIT AVISITN
                 PARAM PARAMCD PARAMN AVAL BASE CHG DTYPE AWRANGE AWTARGET AWTDIFF AWLO AWHI AWU ABLFL ANL01FL;
 
 * Create dataset with visit windows;
@@ -57,7 +55,7 @@ data adsl (keep = studyid usubjid subjid siteid ittfl efffl trt01p trt01pn trtsd
   set adamw.adsl;
 run;
 
-* Get questionnaire data and filter on ALZHEIMER'S DISEASE ASSESSMENT SCALE;
+* Get questionnaire data and filter on ALZHEIMERS DISEASE ASSESSMENT SCALE;
 data qs (keep = usubjid visit visitnum qsseq adt paramcd param paramn qsstresn);
   set sdtm.qs;
   if (qscat eq "ALZHEIMER'S DISEASE ASSESSMENT SCALE");
@@ -219,7 +217,7 @@ data qsaval;
   if (paramcd ne "ACTOT") then aval = qsstresn;
   else if (paramcd eq "ACTOT") then do;
     if (n eq 11)     then aval = sum;
-	else if (n ge 8) then aval = sum * 70 / (70 - summax);
+        else if (n ge 8) then aval = sum * 70 / (70 - summax);
   end;
 run;
 
@@ -310,12 +308,12 @@ data qslocf;
 
   if first.paramcd then do;
     avallocf     = .;
-	visitlocf    = "";
-	visitnumlocf = .;
-	adtlocf      = .;
-	adylocf      = .;
-	arndylocf    = .;
-	qsseqlocf    = .;
+        visitlocf    = "";
+        visitnumlocf = .;
+        adtlocf      = .;
+        adylocf      = .;
+        arndylocf    = .;
+        qsseqlocf    = .;
   end;
 
   if (anl01fl eq "Y") then do;
@@ -337,31 +335,31 @@ data qslocf2;
   if (aval eq .) and (avallocf ne .) then do;
     if (paramcd eq "ACTOT") and (aval eq .) and (avallocf ne .) then do;
       aval  = avallocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (visit eq "") and (visitlocf ne "") then do;
       visit  = visitlocf;
-	  dtype  = "LOCF";
+          dtype  = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (visitnum eq .) and (visitnumlocf ne .) then do;
       visitnum  = visitnumlocf;
-	  dtype     = "LOCF";
+          dtype     = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (adt eq .) and (adtlocf ne .) then do;
       adt   = adtlocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (ady eq .) and (adylocf ne .) then do;
       ady   = adylocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (arndy eq .) and (arndylocf ne .) then do;
       arndy = arndylocf;
-  	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "ACTOT") and (qsseq eq .) and (qsseqlocf ne .) then do;
       qsseq   = qsseqlocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
   end;
   if (awtdiff eq .) and (arndy ne .) and (awtarget ne .) then awtdiff = abs(arndy - awtarget);
@@ -397,13 +395,13 @@ data adamw.adqsadas (label = "ADAS-Cog Analysis Dataset");
 
   label
     STUDYID  = "Study Identifier"
-	SITEID   = "Study Site Identifier"
+        SITEID   = "Study Site Identifier"
     USUBJID  = "Unique Subject Identifier"
     ITTFL    = "Intent-To-Treat Population Flag"
     EFFFL    = "Efficacy Population Flag"
     TRTP     = "Planned Treatment"
     TRTPN    = "Planned Treatment (N)"
-	QSSEQ    = "Analysis Date"
+        QSSEQ    = "Analysis Date"
     ADT      = "Analysis Date"
     ADY      = "Analysis Relative Day"
     ARNDY    = "Analysis Relative to Randomization Day"
@@ -433,5 +431,5 @@ run;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+*%s_scanlog;
 ********;
