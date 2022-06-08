@@ -1,13 +1,11 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : adqscibi.sas
 * Purpose              : Create ADQSCIBI dataset
@@ -15,7 +13,7 @@ dm 'log;clear;';
 * DESCRIPTION                                                    
 *                                                                   
 * Input files:  SDTM.QS
-*				ADaM.ADSL
+*               ADaM.ADSL
 *                                                                   
 * Output files: ADaM.ADQSCIBI 
 *                                                                 
@@ -185,13 +183,13 @@ data qslocf;
 
   if first.paramcd then do;
     avallocf     = .;
-	avalclocf    = "";
-	visitlocf    = "";
-	visitnumlocf = .;
-	adtlocf      = .;
-	adylocf      = .;
-	arndylocf    = .;
-	qsseqlocf    = .;
+        avalclocf    = "";
+        visitlocf    = "";
+        visitnumlocf = .;
+        adtlocf      = .;
+        adylocf      = .;
+        arndylocf    = .;
+        qsseqlocf    = .;
   end;
 
   if (anl01fl eq "Y") then do;
@@ -214,35 +212,35 @@ data qslocf2;
   if (aval eq .) and (avallocf ne .) then do;
     if (paramcd eq "CIBIC") and (aval eq .) and (avallocf ne .) then do;
       aval  = avallocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
-	if (paramcd eq "CIBIC") and (avalc eq "") and (avalclocf ne "") then do;
+        if (paramcd eq "CIBIC") and (avalc eq "") and (avalclocf ne "") then do;
       avalc = avalclocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (visit eq "") and (visitlocf ne "") then do;
       visit  = visitlocf;
-	  dtype  = "LOCF";
+          dtype  = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (visitnum eq .) and (visitnumlocf ne .) then do;
       visitnum  = visitnumlocf;
-	  dtype     = "LOCF";
+          dtype     = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (adt eq .) and (adtlocf ne .) then do;
       adt   = adtlocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (ady eq .) and (adylocf ne .) then do;
       ady   = adylocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (arndy eq .) and (arndylocf ne .) then do;
       arndy = arndylocf;
-  	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
     if (paramcd eq "CIBIC") and (qsseq eq .) and (qsseqlocf ne .) then do;
       qsseq   = qsseqlocf;
-	  dtype = "LOCF";
+          dtype = "LOCF";
     end;
   end;
   if (awtdiff eq .) and (arndy ne .) and (awtarget ne .) then awtdiff = abs(arndy - awtarget);
@@ -308,5 +306,5 @@ run;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+*%s_scanlog;
 ********;
