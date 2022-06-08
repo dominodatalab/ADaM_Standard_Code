@@ -39,7 +39,7 @@ run;
 %s_compare(base = ADAM._ALL_,
 		   comp = ADAMQC._ALL_,
 		   comprpt = '/mnt/artifacts/compare.pdf',
-		   prefix =NULL);
+		   prefix =);
 
 
 
