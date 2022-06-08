@@ -29,6 +29,22 @@
 ** Setup environment including libraries for this reporting effort;
 %include "!DOMINO_WORKING_DIR/config/domino.sas";
 *********;
+
+%xpt2loc(filespec='/mnt/data/ADAM/adsl.xpt');
+
+data adam.adsl;
+	set adsl;
+run;
+
+%s_compare(base = ADAM._ALL_,
+		   comp = ADAMQC._ALL_,
+		   comprpt = '/mnt/artifacts/compare.pdf',
+		   prefix =NULL);
+
+
+
+
+
 /*  */
 /* Obtain xpt file names  */
 /* data xptnames (where = (scan(strip(fname),2,'.') = 'xpt')); */
@@ -64,23 +80,6 @@
 /* %mend xpt_sas; */
 /*  */
 /* %xpt_sas; */
-
-%xpt2loc(filespec='/mnt/data/ADAM/adsl.xpt');
-
-data adam.adsl;
-	set adsl;
-run;
-
-%s_compare(base = ADAM._ALL_,
-		   comp = ADAMQC._ALL_,
-		   comprpt = '/mnt/artifacts/compare.pdf',
-		   prefix =);
-
-
-
-
-
-
 
 
 
