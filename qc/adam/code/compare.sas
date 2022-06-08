@@ -5,8 +5,8 @@
 *       \ \/(/_| (_|| | |(/_(_|                                                 
 *        O                                                                      
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
-* Study                : Pilot01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : compare.SAS
 * Purpose              : To compare all adam datasets
 * ____________________________________________________________________________
@@ -14,9 +14,9 @@
 *                                                                   
 * Input files:  ADAM ADAMQC
 *              
-* Output files: ADSL
+* Output files: compare.pdf, adsl.sas7bdat
 *               
-* Macros:       None
+* Macros:       s_compare
 *         
 * Assumptions: 
 *
@@ -24,6 +24,8 @@
 * PROGRAM HISTORY                                                         
 *  08JUN2022   | Jake Tombeur   | Original version
 \*****************************************************************************/
+
+%let _STUDYID = H2QMCLZZT;
 
 *********;
 ** Setup environment including libraries for this reporting effort;
