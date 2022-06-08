@@ -30,36 +30,81 @@
 %include "!DOMINO_WORKING_DIR/config/domino.sas";
 *********;
 
-/* Obtain xpt file names */ 
-data xptnames (where = (scan(strip(fname),2,'.') = 'xpt'));
-	length fref $8 fname $200;
-	tmp = filename(fref,'/mnt/data/ADAM');
-	tmp = dopen(fref);
-	do i = 1 to dnum(tmp);
-		fname = dread(tmp,i);
- 		output;
-	end;
-	tmp = dclose(tmp);
-	tmp = filename(fref);
-    keep fname;
-run;
-
+/* Obtain xpt file names  */
+/* data xptnames (where = (scan(strip(fname),2,'.') = 'xpt')); */
+/* 	length fref $8 fname $200; */
+/* 	tmp = filename(fref,'/mnt/data/ADAM'); */
+/* 	tmp = dopen(fref); */
+/* 	do i = 1 to dnum(tmp); */
+/* 		fname = dread(tmp,i); */
+/*  		output; */
+/* 	end; */
+/* 	tmp = dclose(tmp); */
+/* 	tmp = filename(fref); */
+/*     keep fname; */
+/* run; */
+/*  */
 /* create macro variable 'xpts' to capture all individual xpt file names */
-proc sql noprint;
-    select fname into: xpts separated by ' '
-    from xptnames
-    ;
-quit;
+/* proc sql noprint; */
+/*     select strip(fname) into:xpts separated by ' ' */
+/*     from xptnames */
+/*     ; */
+/* quit; */
+/*  */
+/* loop through all individual files and add to adam as sas7bdat */
+/* %macro xpt_sas; */
+/*     %do i=1 %to %sysfunc(countw(&xpts)); */
+/* 		%let currnam = %scan(&xpts, &i, ' '); */
+/* 		%let currpth = %bquote('/mnt/data/ADAM/)&currnam %bquote('); */
+/* 		%xpt2loc(filespec=&currpth); */
+/* 		data ADAM.&currnam; */
+/* 			set &currnam; */
+/* 		run; */
+/* 	%end; */
+/* %mend xpt_sas; */
+/*  */
+/* %xpt_sas; */
 
-/* loop through all individual files and add tro adam as sas7bdat*/
-%macro xpt_sas;
-    %do i=1 %to %sysfunc(countw(&xpts));
-         libname xptfile xport "/mnt/data/ADAM/%scan(&xptprgs, &i).xpt" access=readonly;
+%xpt2loc(filespec='/mnt/data/ADAM/adsl.xpt');
 
-         proc copy inlib=xptfile outlib=ADAM;
-         run;
-	%end;
-%mend xpt_sas;
 
-%xpt_sas;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
