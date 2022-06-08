@@ -1,35 +1,33 @@
-dm 'out;clear;';
-dm 'log;clear;';
 /*****************************************************************************\
-*        O                                                                      
-*       /                                                                       
-*  O---O     _  _ _  _ _  _  _|                                                 
-*       \ \/(/_| (_|| | |(/_(_|                                                 
-*        O                                                                      
+*  ____                  _
+* |  _ \  ___  _ __ ___ (_)_ __   ___
+* | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
+* | |_| | (_) | | | | | | | | | | (_) |
+* |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
+* Sponsor              : Domino
 * Study                : Pilot01
 * Program              : adlb.sas
 * Purpose              : Create ADLB dataset
 * ____________________________________________________________________________
-* DESCRIPTION                                                    
-*                                                                   
+* DESCRIPTION
+*
 * Input files:  SDTM.LB
-*				ADaM.ADSL
-*                                                                   
+*               ADaM.ADSL
+*
 * Output files: ADaM.ADLB
-*                                                                 
-* Macros:       None                                                       
-*                                                                   
-* Assumptions:                                                    
-*                                                                   
+*
+* Macros:       None
+*
+* Assumptions:
+*
 * ____________________________________________________________________________
-* PROGRAM HISTORY                                                         
-*  31MAY2022 |  Dianne Weatherall   |  Original  
-* ---------------------------------------------------------------------------- 
+* PROGRAM HISTORY
+*  31MAY2022 |  Dianne Weatherall   |  Original
+* ----------------------------------------------------------------------------
 \*****************************************************************************/
 
-    
+
 *********;
 %init;
 *********;
@@ -37,8 +35,8 @@ dm 'log;clear;';
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 
-%let keepvars = STUDYID SITEID USUBJID SAFFL TRTA TRTAN LBDTC ADT ATM ADTM ADY ARNDY VISIT VISITNUM AVISIT AVISITN 
-                PARAM PARAMCD PARAMN PARCAT1 PARCAT1N AVAL AVALC BASE BASEC BASETYPE CHG R2A1LO R2A1HI R2A1DIFF 
+%let keepvars = STUDYID SITEID USUBJID SAFFL TRTA TRTAN LBDTC ADT ATM ADTM ADY ARNDY VISIT VISITNUM AVISIT AVISITN
+                PARAM PARAMCD PARAMN PARCAT1 PARCAT1N AVAL AVALC BASE BASEC BASETYPE CHG R2A1LO R2A1HI R2A1DIFF
                 CHGIND THRIND BTHRIND DTYPE ALBTRVAL LBNRIND ANRIND BNRIND A1LO A1HI A1DIFF ABLFL ANL01FL ANL02FL ONTRTFL LVOTFL;
 
 * Get variables from ADSL;
@@ -103,7 +101,7 @@ data lb2;
 run;
 
 * Derive date/times, parameters;
-data lb3 (keep = usubjid visit visitnum lbseq lbdtc adt atm adtm paramcd param paramn parcat1 parcat1n lborres lbstresn lbstresc 
+data lb3 (keep = usubjid visit visitnum lbseq lbdtc adt atm adtm paramcd param paramn parcat1 parcat1n lborres lbstresn lbstresc
                  lbnrind lbornrlo lbornrhi lbstnrlo lbstnrhi);
   set lb2;
 
@@ -119,11 +117,11 @@ data lb3 (keep = usubjid visit visitnum lbseq lbdtc adt atm adtm paramcd param p
   parcat1 = trim(left(lbcat));
   select (upcase(parcat1));
     when ("CHEMISTRY")         parcat1n = 1;
-	when ("HEMATOLOGY")        parcat1n = 2;
-	when ("OTHER")             parcat1n = 3;
-	when ("URINALYSIS")        parcat1n = 4;
-	when ("")                  parcat1n = .;
-	otherwise put "Check: " parcat1=;
+        when ("HEMATOLOGY")        parcat1n = 2;
+        when ("OTHER")             parcat1n = 3;
+        when ("URINALYSIS")        parcat1n = 4;
+        when ("")                  parcat1n = .;
+        otherwise put "Check: " parcat1=;
   end;
 run;
 
@@ -200,7 +198,7 @@ data lblast;
     by ontrtfl usubjid parcat1n paramn adt adtm;
 
   length lvotfl $ 200;
-  
+
   if last.paramn and (ontrtfl eq "Y") then lvotfl = "Y";
 run;
 
@@ -292,11 +290,11 @@ data lb1base3;
 
   if (lvotfl eq "Y") then do;
     output;
-	avisitn = 601;
-	avisit  = "End of treatment";
-	dtype   = "LONTRT";
-	anl02fl = "";
-	output;
+        avisitn = 601;
+        avisit  = "End of treatment";
+        dtype   = "LONTRT";
+        anl02fl = "";
+        output;
   end;
   else output;
 run;
@@ -358,7 +356,7 @@ data lb2base3;
   retain basetype;
   set lb2base2;
     by usubjid parcat1n paramn rec;
-  
+
   length basetype $ 200;
   if first.rec then basetype = "";
   if (basetyp ne "") then basetype = trim(left(basetyp));
@@ -427,14 +425,14 @@ data lbchg;
   if (basetype ne "VISIT 1") then do;
     if (r2a1diff ne .) and (r2a1diff lt -0.5) then chgind = "LOW";
     else if (r2a1diff gt 0.5)                 then chgind = "HIGH";
-	else if (r2a1diff ne .)                   then chgind = "NORMAL";
+        else if (r2a1diff ne .)                   then chgind = "NORMAL";
   end;
 
   * THRIND;
   if (basetype eq "VISIT 1") then do;
     if (r2a1lo ne .) and (r2a1lo lt 0.5)   then thrind = "LOW";
-	else if (r2a1hi gt 1.5)                then thrind = "HIGH";
-	else if (r2a1lo ne .) or (r2a1hi ne .) then thrind = "NORMAL";
+        else if (r2a1hi gt 1.5)                then thrind = "HIGH";
+        else if (r2a1lo ne .) or (r2a1hi ne .) then thrind = "NORMAL";
   end;
 run;
 
@@ -506,7 +504,7 @@ data adamw.adlb (label = "Laboratory Analysis Dataset");
     THRIND   = "Threshold Indicator"
     BTHRIND  = "Baseline Threshold Indicator"
     DTYPE    = "Derivation Type"
-	ALBTRVAL = "Amount Threshold Range"
+        ALBTRVAL = "Amount Threshold Range"
     LBNRIND  = "Reference Range Indicator"
     ANRIND   = "Analysis Reference Range Indicator"
     BNRIND   = "Baseline Reference Range Indicator"
@@ -515,14 +513,14 @@ data adamw.adlb (label = "Laboratory Analysis Dataset");
     A1DIFF   = "Analysis Range 1"
     ABLFL    = "Baseline Record Flag"
     ANL01FL  = "Analysis Record Flag 01"
-	ANL02FL  = "Analysis Record Flag 02"
+        ANL02FL  = "Analysis Record Flag 02"
     ONTRTFL  = "On Treatment Record Flag"
     LVOTFL   = "Last Value On Treatment Record Flag"
   ;
-  format 
+  format
     adt  date9.
-	atm  time5.
-	adtm datetime21.
+        atm  time5.
+        adtm datetime21.
   ;
 run;
 
