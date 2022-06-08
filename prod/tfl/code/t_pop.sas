@@ -1,4 +1,5 @@
- /*****************************************************************************\
+%include "!DOMINO_WORKING_DIR/config/domino.sas";
+/*****************************************************************************\
 *        O                                                                      
 *       /                                                                       
 *  O---O     _  _ _  _ _  _  _|                                                 
@@ -25,15 +26,11 @@
 *  07JUN2022      | Jake Tombeur     | Original version
 \*****************************************************************************/
 
-*********;
-%include "!DOMINO_WORKING_DIR/config/domino.sas";
-*********;
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 
 %let dddatanam  = t_pop;      /* Dataset name for dddata */
-%let tflid      = 14.1.1;     
-/* Table ID */
+%let tflid      = 14.1.1;     /* Table ID */
 %let outname    = t_pop;      /* Output file name */
 
 /* Picture format for percentages */
@@ -146,7 +143,7 @@ options orientation = landscape nodate nonumber;
 ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 /* Titles and footnotes for PROC REPORT */
-title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
 title2 justify=l "Population: All subjects" ;
 title3 justify=c "Table &tflid";
 title4 justify=c "Summary of Populations" ;
@@ -155,8 +152,8 @@ footnote1 justify=l "N in column headers represents number of subjects entered i
 footnote2 justify=l "The ITT population includes all subjects randomized.";
 footnote3 justify=l "The safety population includes all randomized subjects known to have taken at least one dose of randomized study drug." ;
 footnote4 justify=l "The efficacy population includes all subjects in the safety population who also have at least one post-baseline ADAS-cog and CIBIC+ assessment. " ;
-footnote5 ;
-footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &_SASPROGRAMFILE , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+footnote5 ;te traceability footer  
+footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = tfl.&dddatanam split = '~'
             style = pdfstyle
             style(report) = {width=100% font_face = 'courier new'} 
@@ -191,9 +188,6 @@ proc report data = tfl.&dddatanam split = '~'
     run;
 ods pdf close;
 
-**** END OF USER DEFINED CODE **;
+*EOF;
 
-********;
-**%scanlog;
-********;
 
