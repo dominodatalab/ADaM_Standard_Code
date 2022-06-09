@@ -46,13 +46,6 @@ adlbhy_alt <- adlbhy %>%
          max_ALT_ULN = max(R2A1HI)) %>%
   ungroup()
 
-# rename PARAMCD to "ALT"
-# rename A1HI to "ALT_HI"
-# rename A1LO to "ALT_LO"
-names(adlbhy_alt)[names(adlbhy_alt) == "max_aval"] <- "ALT"
-names(adlbhy_alt)[names(adlbhy_alt) == "A1HI"] <- "ALT_HI"
-names(adlbhy_alt)[names(adlbhy_alt) == "A1LO"] <- "ALT_LO"
-
 
 #---------- get BILI data
 adlbhy_bili_pre <- adlbhy %>%
@@ -63,14 +56,7 @@ adlbhy_bili_pre <- adlbhy %>%
   ungroup()
 
 # keep only needed variables
-adlbhy_bili <- adlbhy_bili_pre[,c("USUBJID", "AVISITN", "max_aval", "max_BILI_ULN", "A1HI", "A1LO")]
-
-# rename PARAMCD to "BILI"
-# rename A1HI to "BILI_HI"
-# rename A1LO to "BILI_LO"
-names(adlbhy_bili)[names(adlbhy_bili) == "max_aval"] <- "BILI"
-names(adlbhy_bili)[names(adlbhy_bili) == "A1HI"] <- "BILI_HI"
-names(adlbhy_bili)[names(adlbhy_bili) == "A1LO"] <- "BILI_LO"
+adlbhy_bili <- adlbhy_bili_pre[,c("USUBJID", "AVISITN", "max_BILI_ULN")]
 
 
 #---------- merge all together
@@ -79,9 +65,9 @@ edish_data_prep <- merge(adlbhy_alt, adlbhy_bili, by = c("USUBJID", "AVISITN"), 
 
 #---------- make eDISH plot
 # find the unique data for each subject
-edish_data_unique <- unique(edish_data_prep[,c("USUBJID", "ALT", "max_ALT_ULN", "BILI", "max_BILI_ULN")])
+edish_data_unique <- unique(edish_data_prep[,c("USUBJID",  "max_ALT_ULN",  "max_BILI_ULN")])
 # find the number of patients that fall within each bound
-edish_summary <- edish_data_unique %>%
+edish_summary_prep <- edish_data_unique %>%
   mutate(status = ifelse(max_ALT_ULN < 1 & max_BILI_ULN < 1, "Normal",
                          ifelse(max_ALT_ULN < 3 & max_BILI_ULN < 2 & max_ALT_ULN >= 1 , "",
                                 ifelse(max_ALT_ULN < 3 & max_BILI_ULN < 2 & max_BILI_ULN >= 1, "",
@@ -91,21 +77,50 @@ edish_summary <- edish_data_unique %>%
                                                             NA))))))) %>%
   group_by(status) %>%
   summarise(USUBJID, 
-            n = n(), 
-            x_lab = ifelse(status != "", floor(min(max_ALT_ULN)), 1), # x position for labels
-            y_lab = ifelse(status != "", floor(min(max_BILI_ULN)), 0)) %>% # y position for labels
+            max_ALT_ULN,
+            max_BILI_ULN,
+            n = n()) %>%
   ungroup()
 
-# get just the unique counts for status
+
+# if any counts = 0, that status will not appear.  Merge this on to make 0 appear
+status_all <- data.frame(status = c("Normal", "", "Hy's Law", "Hyperbilirubinemia", "Temple's Corollary"),
+                         n_0 = rep(0,5))
+
+edish_summary_pre <- merge(edish_summary_prep, status_all, by = "status", all = TRUE) 
+
+edish_summary <- edish_summary_pre %>%
+  summarise(USUBJID,
+            status,
+            n = ifelse(is.na(n) == TRUE, 0, n),
+            x_lab = ifelse(status == "Normal", floor(min(max_ALT_ULN)), 
+                           ifelse(status == "", 1,
+                                  ifelse(status == "Hy's Law", 3,
+                                         ifelse(status == "Hyperbilirubinemia",  floor(min(max_ALT_ULN)),
+                                                ifelse(status == "Temple's Corollary", 3, NA))))),
+            y_lab = ifelse(status == "Normal", floor(min(max_BILI_ULN)), 
+                           ifelse(status == "", floor(min(max_BILI_ULN)),
+                                  ifelse(status == "Hy's Law", 2,
+                                         ifelse(status == "Hyperbilirubinemia", 2,
+                                                ifelse(status == "Temple's Corollary", floor(min(max_BILI_ULN)),
+                                                       NA))))))
+
+
+
+# get just the unique counts for status to be used as text on plot
 status_count <- unique(edish_summary[,c("status", "n", "x_lab", "y_lab")])
 
 # merge onto edish_data_prep to make edish_data
 edish_data <- merge(edish_data_prep, edish_summary, by = "USUBJID", all = TRUE)
 
 
+#---------- the edish plot
 
+# save and output as a PNG
+setwd("/mmt/artifacts/  results")
+png(file = "edish.png", height = (5*480), width = 2*(5*480), res=400)
 
-#---------- the plot
+# plot
 ggplot(data = edish_data) +
   
   # add labels of number in each status
@@ -149,18 +164,28 @@ ggplot(data = edish_data) +
              linetype = "dashed",
              col = "grey40") +
   
+  # annotate outside of plot where 1 X ULN and 3 X ULN for ALT
+  annotate("text",
+           x = c(1,3),
+           y = c(max(max(edish_data$max_BILI_ULN),4) + 2.5,
+                 max(max(edish_data$max_BILI_ULN), 4) + 2.5),
+           label = c("1 X ULN", "3 X ULN")
+  ) +
+  
+  # set axis limits 
+  coord_cartesian(ylim = c(min(edish_data$max_BILI_ULN) - 0.05,
+                           max(edish_data$max_BILI_ULN) + 0.2),
+                  clip = "off") +
+  
   # axis labels 
   labs(x = "Maximum ALT (/ULN)",
        y = "Maximum BILI (/ULN)",
        title = "Maximum Bilirubin VS Maximum Alanine Aminotransferase") +
   
-  
-  
-  # set scales for x an y 
+  # set log scales for x an y axis, 
   scale_x_continuous(trans='log2') +
   scale_y_continuous(trans='log2') +
-  expand_limits(x=c(0,6), y= c(0)) +
-  
+  expand_limits(x=c(0, 6), y= c(0, 4)) + # the smallest axis limits given, but will be bigger if data points are
   
   # theme
   theme( strip.background = element_blank(),
@@ -170,6 +195,7 @@ ggplot(data = edish_data) +
          strip.text = element_text(size = 8,
                                    margin = margin(b = 5)),
          panel.background = element_rect(fill = "white"),
+         panel.border = element_rect(colour = "black", fill=NA, size=1),
          #panel.grid = element_line(colour = "black"),
          plot.title = element_text(size = 15,
                                    hjust = 0.5,
@@ -180,6 +206,9 @@ ggplot(data = edish_data) +
          axis.title.x = element_text(size = 11,
                                      margin = margin(t = 15),
                                      color = "black"),
+         axis.title.y = element_text(size = 11,
+                                     margin = margin(r = 15),
+                                     color = "black"),
          plot.subtitle = element_text(size = 11,
                                       margin = margin(b = 15)),
          axis.text.x = element_text(size = 12,
@@ -187,4 +216,4 @@ ggplot(data = edish_data) +
          axis.text.y = element_text(size = 11,
                                     color = "black",
                                     hjust = 0))
-
+dev.off() # Closes the plot and saves it as file
