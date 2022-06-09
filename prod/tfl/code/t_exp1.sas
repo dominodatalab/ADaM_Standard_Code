@@ -62,7 +62,7 @@ data stats_long (drop = sec_stat value);
     set sumstats_t;
 
     sec =  scan(sec_stat, 1, '_');
-    stat = scan(sec_stat, 2, '_');
+    stat = upcase(scan(sec_stat, 2, '_'));
 
     if      stat in ('N', 'MIN', 'MAX') then valc = strip(put(value, 10.));
     else if stat in ('MEAN', 'MEDIAN')  then valc = strip(put(value, 11.1));
