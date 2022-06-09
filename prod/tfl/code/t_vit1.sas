@@ -5,8 +5,8 @@
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : C999
-* Study                : PILOT01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_vit1.SAS
 * Purpose              : Create Summary of Vital Signs at Baseline and End of Treatment
 * ____________________________________________________________________________
@@ -35,7 +35,7 @@
 
 *create Big N macro variables;
 data bigN_mac;
-  set adamw.adsl (where = ((SAFFL = 'Y'))) end = eof;
+  set adam.adsl (where = ((SAFFL = 'Y'))) end = eof;
   retain npl ndum ndumax;
   if _N_ = 1 then do;
     npl = 0;
@@ -53,7 +53,7 @@ data bigN_mac;
 run;
 
 *read in advs;
-proc sort data = adamw.advs (where = (anl01fl='Y' and paramn in(1,2,3)))
+proc sort data = adam.advs (where = (anl01fl='Y' and paramn in(1,2,3)))
           out = fromVS;
   by PARAMN PARAM atpt TRTAN TRTA  AVISITN AVISIT;
 run;
@@ -135,16 +135,16 @@ quit;
 
 *Format vars for proc report;
 data Vitals;
-  attrib rowlbl1   length = $200     label='Measure'
-         rowlbl2   length = $200     label='Position'
-         rowlbl3   length = $200     label='Treatment'
-         rowlbl4   length = $200     label='Planned |n Relative time'
-		 col1   length = $200     label='n'
-         col2   length = $200     label='Mean'
-		 col3   length = $200     label='SD'
-         col4   length = $200     label='Median'
-         col5   length = $200     label='Min.'
-         col6   length = $200     label='Max.';
+  attrib rowlbl1   length = $100     label='Measure'
+         rowlbl2   length = $100     label='Position'
+         rowlbl3   length = $100     label='Treatment'
+         rowlbl4   length = $100     label='Planned |n Relative time'
+		 col1   length = $100     label='n'
+         col2   length = $100     label='Mean'
+		 col3   length = $100     label='SD'
+         col4   length = $100     label='Median'
+         col5   length = $100     label='Min.'
+         col6   length = $100     label='Max.';
   set vs_stats_ord3(rename=(ord3=rowgrp3)) ;
 
 
@@ -183,25 +183,45 @@ run;
 /*run;*/
 
 /* Create rtf output */
-%p_rtfCourier();
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
+
 title; footnote;
 
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 
     /* Titles and footnotes for PROC REPORT */
-    title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+    title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
     title2 justify=l "Population: Safety" ;
     title3 justify=c "Table &tflid. Summary of Vital Signs at Baseline and End of Treatment" ;
 
     footnote1 justify=l "SD = Standard deviation. BP= Blood pressure.";
     footnote2 justify=l "End of treatment is the last on-treatment visit (i.e. on or before Week 24 visit).";
     footnote3 ;
-    footnote4 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+    footnote4 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 
     proc report data = vitals split = '~'
-            style = rtfCourier
+            style = pdfstyle
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
             style(header) = {just = c}
@@ -250,7 +270,7 @@ ods escapechar = '|';
             
     run;
     
-ods rtf close; 
+ods pdf close; 
 title; footnote;
 
 **** END OF USER DEFINED CODE **;

@@ -5,8 +5,8 @@
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : C999
-* Study                : PILOT01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_disp_all.SAS
 * Purpose              : Create disposition table for all population
 * ____________________________________________________________________________
@@ -33,20 +33,23 @@
 %let linesperpage = 25 ;
 %let flag = ittfl ;
 %let dddata = t_disp_all ;
-%let tflid = t_13_01_01_disp_all ;
+%let outname = t_disp_all ;
 %let shell=TDISP1 ;
 %let shell_file = Z:\Users\lindsey.megarry\veramedimol\C006\VeraMedimol\Pilot01\re_dmc01\documents\SAP_and_shells\Shells v0.2.xlsx ;
 %let tfl_style=C999 ;
 
 /*get report totals*/
 data total ;
-   set adamw.adsl ;
+   set adam.adsl ;
     output ;
    trt01pn=99 ;
    trt01p='Total' ;
     output ;
 run ;
 
+proc sort data = total;
+	by usubjid trt01pn trt01p;
+run; 
 /*get bigns*/
 proc sql noprint ;
    select count(distinct usubjid) into :pop1 - :pop4 
@@ -56,7 +59,7 @@ proc sql noprint ;
 
    create table popt as
    select trt01pn, trt01p, count(distinct usubjid) as popt 
-   from total
+   from total (where = (trt01pn ^= .))
    group by trt01pn, trt01p
    ;
 
@@ -91,7 +94,7 @@ data &pop.2 ;
    end ;
 run ;
 
-proc transpose data=&pop.2
+proc transpose data=&pop.2 (where = (trt01pn ^= .))
                out= tran_&pop. 
                prefix=_;
    var &pop.2; /*numerical vars that were across but now down*/
@@ -106,7 +109,7 @@ run ;
 
 data rep1 ;
    set tran_: ;
-   length text $200 TRT1-TRT4 $100 ;
+   length text $100 TRT1-TRT4 $100 ;
    if _NAME_='ittfl2' then do ;text='Intent-to-treat set [a]'; order=1; end ;
    else if _NAME_='saffl2' then do ;text='Safety set [b]'; order=2; end ;
    else if _NAME_='efffl2' then do ;text='Efficacy set [c]'; order=4; end ;
@@ -175,7 +178,7 @@ run ;
 %let numtrt=4 ;
 
 
-data freq ;
+data freq (where = (trt01pn ^= .));
    set total ;
    if trt01pn=0 then trt01pn2=1 ;
    else if trt01pn=54 then trt01pn2=2 ;
@@ -238,12 +241,14 @@ run ;
       );
 
 /*stck together and provide labels*/
+
 data _null_ ;
    set popt ;
-   call symputx('lab'||strip(put(trt01pn,2.-l)), trt01p) ;
+   call symputx(cats("lab",strip(put(trt01pn,2.))), trt01p,'g') ;
 run ;
 
 data rep2 ;
+length text $100;
    set rep1 
        no_trt2
        comp24 (drop= counttype complfl _name_ )
@@ -258,52 +263,43 @@ data rep2 ;
 run ;
 
 /*=====================================================================================*/
-data tflw.&dddata. ;
+data tfl.&dddata. ;
    set rep2 ;
 run ;
 
 /*style*/
 proc template;
-   define style Styles.C999RTF;
-      parent = Styles.RTF;
-
-   replace Body from Document /
-      bottommargin = 1.54cm
-      topmargin = 2.54cm
-      rightmargin = 2.54cm
-      leftmargin = 2.54cm;
-
-   replace fonts /
-           'TitleFont2' = ("Courier New",9pt)
-           'TitleFont' = ("Courier New",9pt/*,Bold*/)     /* titles */
-           'StrongFont' = ("Courier New",9pt/*,Bold*/)
-           'EmphasisFont' = ("Courier New",9pt,Italic)
-           'FixedEmphasisFont' = ("Courier New, Courier",9pt,Italic)
-           'FixedStrongFont' = ("Courier New, Courier",9pt/*,Bold*/)
-           'FixedHeadingFont' = ("Courier New, Courier",9pt/*,Bold*/)
-           'BatchFixedFont' = ("SAS Monospace, Courier New, Courier",9pt)
-           'FixedFont' = ("Courier New, Courier",9pt)
-           'headingEmphasisFont' = ("Courier New",9pt,Bold Italic)
-           'headingFont' = ("Courier New",9pt/*,Bold*/)   /* header block */
-           'docFont' = ("Courier New",9pt);           /* table cells */
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
 
 
-   replace color_list
-         "Colors used in the default style" /
-         'link' = blue
-         'bgH' = white     /* header background */
-         'fg' = black
-         'bg' = _undef_;
+options orientation=landscape ;
 
-end;
-
-run ;
-
+ods listing close;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar="~" ;
 
-title1 justify=l "Protocol: CDISCPILOT01" j=r "Page ~{thispage} of ~{lastpage}" ;
+title1 justify=l "Protocol: &__PROTOCOL." j=r "Page ~{thispage} of ~{lastpage}" ;
 title2 justify=l "Population: Intent-to-treat" ;
-title3 justify=c "Table 13.01.01 Summary of Patient Disposition (ITT)" ;
+title3 justify=c "Table 14.1.2.1";
+title4 justify=c "Summary of Patient Disposition" ;
+
 
 footnote1 justify=l "[a] All patients randomized." ;
 footnote2 justify=l "[b] All randomized subjects known to have taken at least one dose of randomized study drug.";
@@ -311,17 +307,13 @@ footnote3 justify=l "[c] All subjects in the receiving treatment who also have a
 footnote4 justify=l "[d] Based on either patient/caregiver perception or physician perception." ;
 footnote5 justify=l "Percentages are calculated from the number of patients randomized.";
 footnote6 ;
-footnote7 justify=l "Source: Z:\Users\lindsey.megarry\veramedimol\C999\VeraMedimol\Pilot01\re_dmc01\prod\tfl\code\t_dips_all.sas, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+footnote7 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 
 
-options nofontembedding noquotelenmax nodate nonumber orientation=landscape ls=132 ps=52 center missing=' ' ;
-
-ods listing close;
-ods rtf file= "Z:\Users\lindsey.megarry\veramedimol\C999\VeraMedimol\Pilot01\re_dmc01\prod\tfl\output\&tflid..rtf" 
-       style=&tfl_style.rtf ;
 *------------------------------------------------------------------------------;
-proc report data=tflw.&dddata. split='$' nowindows spacing=2 missing 
-   style(report)=[width=100% just=center] 
+proc report data=tfl.&dddata. split='$' nowindows spacing=2 missing 
+style = pdfstyle   
+style(report)=[width=100% just=center] 
    style(header)=[borderbottomcolor=black borderbottomwidth=2 
                   bordertopcolor=black bordertopwidth=2just=center] style=&tfl_style.rtf ;
 
@@ -348,8 +340,7 @@ proc report data=tflw.&dddata. split='$' nowindows spacing=2 missing
 run;
 
 *------------------------------------------------------------------------------;
-ODS RTF close;
-ODS listing;
+ODS pdf close;
 title; footnote;
 
 
@@ -357,6 +348,6 @@ title; footnote;
 **** END OF USER DEFINED CODE **;
 
 ********;
-%s_scanlog;
+/* %s_scanlog; */
 ********;
 

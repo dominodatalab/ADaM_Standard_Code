@@ -5,8 +5,8 @@
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : C999
-* Study                : PILOT01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_pm.sas
 * Purpose              : Create Summary of Prior Medications 
 * ____________________________________________________________________________
@@ -37,7 +37,7 @@
 
 *create Big N macro variables;
 data bigN_mac;
-  set adamw.adsl (where = ((SAFFL = 'Y'))) end = eof;
+  set adam.adsl (where = ((SAFFL = 'Y'))) end = eof;
   retain npl ndum ndumax;
   if _N_ = 1 then do;
     npl = 0;
@@ -57,7 +57,7 @@ run;
 
 *dataset containing big N counts;
 data adsl_tot;
-  set adamw.adsl (where = ((saffl = 'Y')));
+  set adam.adsl (where = ((saffl = 'Y')));
   output;
   trt01an=100;
   trt01a="Total";
@@ -70,7 +70,7 @@ proc freq data = adsl_tot noprint;
 run;
 
 *read in adcm;
-proc sort data = adamw.adcm (where = (prefl='Y'))
+proc sort data = adam.adcm (where = (prefl='Y'))
           out = fromCM;
   by cmdecod cmclas cmstdtc astdt;
 run;
@@ -87,17 +87,17 @@ run;
 *get counts using CMCLAS and CMDECOD. Both variables will need confirmation;
 proc sql noprint;
   create table row1_db as
-  select TRTaN, count(distinct(usubjid)) as CNT, "Any medication" as rowlbl1 LENGTH = 200, 0 as rowgrp1 
+  select TRTaN, count(distinct(usubjid)) as CNT, "Any medication" as rowlbl1 LENGTH = 100, 0 as rowgrp1 
   from cm_total
   group by TRTaN;
 
   create table db_atc1 as  
-  select TRTaN, cmclas, count(distinct(usubjid)) as CNT, "Any medication" as rowlbl1 LENGTH = 200 
+  select TRTaN, cmclas, count(distinct(usubjid)) as CNT, "Any medication" as rowlbl1 LENGTH = 100 
   from cm_total
   group by TRTaN, cmclas;
 
   create table db_pts as  
-  select TRTaN, cmclas, cmdecod, count(distinct(usubjid)) as CNT, cmdecod as rowlbl1 LENGTH = 200 
+  select TRTaN, cmclas, cmdecod, count(distinct(usubjid)) as CNT, cmdecod as rowlbl1 LENGTH = 100 
   from cm_total
   group by TRTaN, cmclas, cmdecod;
 
@@ -165,11 +165,11 @@ run;
 
 *include another order variable and create col1-col vars;
 data cm_final;
-  attrib rowlbl1   length = $200     label='ATC Level 1 |n Ingredient'
-		 col1   length = $200     label="Placebo |n (N=&npl.)   |n n(%)"
-         col2   length = $200     label="Xanomeline Low Dose |n (N=&ndum.)   |n n(%)"
-		 col3   length = $200     label="Xanomeline High Dose |n (N=&ndumax.)   |n n(%)"
-         col4   length = $200     label="Total |n (N=&tot.)   |n n(%)";
+  attrib rowlbl1   length = $100     label='ATC Level 1 |n Ingredient'
+		 col1   length = $100     label="Placebo |n (N=&npl.)   |n n(%)"
+         col2   length = $100     label="Xanomeline Low Dose |n (N=&ndum.)   |n n(%)"
+		 col3   length = $100     label="Xanomeline High Dose |n (N=&ndumax.)   |n n(%)"
+         col4   length = $100     label="Total |n (N=&tot.)   |n n(%)";
 
   set alltransp
       db_soc_ord(in=a);
@@ -205,15 +205,34 @@ proc sort data=cm_final out=t_pm;
 run;
 
 
-%p_rtfCourier();
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
 title; footnote;
 
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 
     /* Titles and footnotes for PROC REPORT */
-    title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+    title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
     title2 justify=l "Population: Safety" ;
     title3 justify=c "Table &tflnum." ;
 	title4 justify=c "Summary of Prior Medications" ;
@@ -221,10 +240,10 @@ ods escapechar = '|';
     footnote1 justify=l "A medication may be included in more than one ATC level category and appear more than once.";
     footnote2 justify=l "Percentages are based on the number of subjects in the safety population within each treatment group.";
     footnote3 ;
-    footnote4 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+footnote4 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 
     proc report data = t_pm split = '~'
-            style = rtfCourier
+            style = pdfstyle
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
             style(header) = {bordertopcolor = black bordertopwidth = 3 just = c}
@@ -264,7 +283,7 @@ ods escapechar = '|';
             
     run;
     
-ods rtf close; 
+ods pdf close; 
 title; footnote;
 
 **** END OF USER DEFINED CODE **;

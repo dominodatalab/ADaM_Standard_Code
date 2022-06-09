@@ -5,8 +5,8 @@
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : c999
-* Study                : pilot01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_exp1.SAS
 * Purpose              : Create the exposure table 14.4.1
 * ____________________________________________________________________________
@@ -38,8 +38,8 @@
 data anadsl (keep = pop trt01pn cumdose avgdd);
     length pop $ 6;
     /* Data for each population */
-    set adamw.adsl (in = inwk26 where = (complfl = 'Y'))
-        adamw.adsl (in = insaf  where = (saffl    = 'Y'));
+    set adam.adsl (in = inwk26 where = (complfl = 'Y'))
+        adam.adsl (in = insaf  where = (saffl    = 'Y'));
     if      inwk26 then pop = 'week24';
     else if insaf  then pop = 'safety';
 run;
@@ -62,7 +62,7 @@ data stats_long (drop = sec_stat value);
     set sumstats_t;
 
     sec =  scan(sec_stat, 1, '_');
-    stat = scan(sec_stat, 2, '_');
+    stat = upcase(scan(sec_stat, 2, '_'));
 
     if      stat in ('N', 'MIN', 'MAX') then valc = strip(put(value, 10.));
     else if stat in ('MEAN', 'MEDIAN')  then valc = strip(put(value, 11.1));
@@ -104,7 +104,7 @@ proc sql;
 quit;
 
 /* Transpose by treatment/population */
-proc transpose delim = _ data = stats_disp out = tflw.&dddatanam (drop = _:);
+proc transpose delim = _ data = stats_disp out = tfl.&dddatanam (drop = _:);
     id pop trt01pn;
     by page secord secf statord statf;
     var valc;
@@ -135,15 +135,35 @@ run;
 %mend;
 %bigN(indat = anadsl, byvars = pop trt01pn);
 
-%p_rtfCourier();
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
+
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 
 /* Titles and footnotes for PROC REPORT */
-title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
 title2 justify=l "Population: Efficacy" ;
 title3 justify=c "Table &tflid" ;
 title4 justify=c "Summary of Planned Exposure to Study drug" ;
@@ -152,9 +172,9 @@ footnote1 justify=l "SD = Standard deviation. Min = Minimum. Max = Maximum.";
 footnote2 justify=l "[1] Includes completers and early terminations.";
 footnote3 justify=l "[2] End of study refers to Week 26/Early termination" ;
 footnote4 ;
-footnote5 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
-proc report data = tflw.&dddatanam split = '~'
-            style = rtfCourier
+footnote5 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+proc report data = tfl.&dddatanam split = '~'
+            style = pdfstyle
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
             style(header) = {just = c asis = on}
@@ -195,7 +215,7 @@ proc report data = tflw.&dddatanam split = '~'
 
             
     run;
-ods rtf close;
+ods pdf close;
 
 
 
