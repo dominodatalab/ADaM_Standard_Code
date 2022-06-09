@@ -127,7 +127,7 @@ ggplot(data = edish_data) +
   geom_text(data = status_count,
             aes(x = x_lab + 0.2,
                 y = y_lab + 0.2),
-            label = paste(status_count$status, "\n n = ", status_count$n),
+            label = paste(status_count$status, "\nn = ", status_count$n),
             hjust = -0,
             vjust = -0,
             col = "red") +
