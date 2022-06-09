@@ -5,8 +5,8 @@
 *       \ \/(/_| (_|| | |(/_(_|                                                 
 *        O                                                                      
 * ____________________________________________________________________________
-* Sponsor              : Veramedimol
-* Study                : Pilot01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : ADSL.SAS
 * Purpose              : To create the ADaM ADSL dataset
 * ____________________________________________________________________________
