@@ -59,7 +59,7 @@ proc sql noprint ;
 
    create table popt as
    select trt01pn, trt01p, count(distinct usubjid) as popt 
-   from total
+   from total (where = (trt01pn ^= .))
    group by trt01pn, trt01p
    ;
 
@@ -241,9 +241,10 @@ run ;
       );
 
 /*stck together and provide labels*/
+
 data _null_ ;
    set popt ;
-   call symputx('lab'||strip(put(trt01pn,2.-l)), trt01p) ;
+   call symputx(cats("lab",strip(put(trt01pn,2.))), trt01p,'g') ;
 run ;
 
 data rep2 ;
@@ -290,7 +291,7 @@ run;
 
 options orientation=landscape ;
 
-
+ods listing close;
 ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar="~" ;
 
