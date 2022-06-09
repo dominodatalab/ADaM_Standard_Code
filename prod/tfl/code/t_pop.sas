@@ -47,7 +47,7 @@ proc format;
 run;
 
 /* Create total column data and sort */
-data adsltot;
+data adsltot (where = (trt01an ^= .));
     set adam.adsl adam.adsl (in = intot);
     if intot then trt01an = 99;
 run;
@@ -82,7 +82,7 @@ proc sql;
 
     /* Create and merge template with observed counts */
     create table n_perc as 
-    select a.*, strip(put(b.count, 5.)) as count, put(round(100*b.count/a.bign,0.1), pctmf.) as perc
+    select a.*, ifc(b.count = . ,'0',strip(put(b.count, 5.))) as count, put(round(100*b.count/a.bign,0.1), pctmf.) as perc
     from (select * from bign, temp_part) a
          left join (select count(distinct usubjid) as count, trt01an, flagvar
                     from pops_t
