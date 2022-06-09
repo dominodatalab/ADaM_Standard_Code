@@ -118,7 +118,7 @@ edish_data <- merge(edish_data_prep, edish_summary, by = "USUBJID", all = TRUE)
 
 # save and output as a PNG
 setwd("/mnt/artifacts/results")
-pdf(file = "edish.pdf", height = (5*480), width = 2*(5*480))
+pdf(file = "edish.pdf", height = 6, width = 12)
 
 # plot
 ggplot(data = edish_data) +
@@ -136,7 +136,7 @@ ggplot(data = edish_data) +
   geom_point(aes(x = max_ALT_ULN,
                  y = max_BILI_ULN,
                  color = TRTA),
-             size = 2.1) +
+             size = 2) +
   
   # set point colours
   scale_color_manual(values = c("grey60", "dodgerblue", "limegreen"),
