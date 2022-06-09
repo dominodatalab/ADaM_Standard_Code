@@ -47,6 +47,9 @@ data total ;
     output ;
 run ;
 
+proc sort data = total;
+	by usubjid trt01pn trt01p;
+run; 
 /*get bigns*/
 proc sql noprint ;
    select count(distinct usubjid) into :pop1 - :pop4 
@@ -284,6 +287,11 @@ proc template;
 run;
 
 
+
+options orientation=landscape ;
+
+ods listing close;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar="~" ;
 
 title1 justify=l "Protocol: &__PROTOCOL." j=r "Page ~{thispage} of ~{lastpage}" ;
@@ -300,11 +308,6 @@ footnote5 justify=l "Percentages are calculated from the number of patients rand
 footnote6 ;
 footnote7 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 
-
-options nofontembedding noquotelenmax nodate nonumber orientation=landscape ls=132 ps=52 center missing=' ' ;
-
-ods listing close;
-ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 
 *------------------------------------------------------------------------------;
 proc report data=tfl.&dddata. split='$' nowindows spacing=2 missing 
