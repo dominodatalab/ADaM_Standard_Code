@@ -6,8 +6,8 @@
 *       \ \/(/_| (_|| | |(/_(_|                                                 
 *        O                                                                      
 * ____________________________________________________________________________
-* Sponsor              : <SPONSOR>
-* Study                : <STUDY>
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_pop.SAS
 * Purpose              : Create Summary of populations table 
 * ____________________________________________________________________________
@@ -152,7 +152,7 @@ footnote1 justify=l "N in column headers represents number of subjects entered i
 footnote2 justify=l "The ITT population includes all subjects randomized.";
 footnote3 justify=l "The safety population includes all randomized subjects known to have taken at least one dose of randomized study drug." ;
 footnote4 justify=l "The efficacy population includes all subjects in the safety population who also have at least one post-baseline ADAS-cog and CIBIC+ assessment. " ;
-footnote5 ;te traceability footer  
+footnote5 ;
 footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = tfl.&dddatanam split = '~'
             style = pdfstyle

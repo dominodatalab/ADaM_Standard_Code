@@ -5,8 +5,8 @@
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : c999
-* Study                : PILOT01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_ae_dth.SAS
 * Purpose              : Create table 14.5.6
 * ____________________________________________________________________________
@@ -56,15 +56,15 @@ run;
 
 /* Dataset for safety analysis set death aes */
 data teae_as;
-    merge adamw.adae (in = inae)
-          adamw.adsl (keep = usubjid saffl);
+    merge adam.adae (in = inae)
+          adam.adsl (keep = usubjid saffl);
     by usubjid;
     if inae & saffl = 'Y' & trtemfl = 'Y' & aesdth = 'Y';
 run;
 
 /* Adsl with trtan */
-data adsl1;
-    set adamw.adsl;
+data adsl1 (where = (trtan ^= .));
+    set adam.adsl;
     trtan = trt01an;
 run; 
 
@@ -262,14 +262,14 @@ data final (drop = i);
     else indent = 'N';
 run;
 
-%p_mcrAddPageVar(dataset_in = final, dataset_out = final1, txt = soc_pt_disp, txt_col_width = 40, max_rows_per_page = 25)
+%p_mcraddpagevar(dataset_in = final, dataset_out = final1, txt = soc_pt_disp, txt_col_width = 40, max_rows_per_page = 25)
 
 
 /*===========================================================================*/
 /*    Creating count data                                                    */
 /*===========================================================================*/
 
-data tflw.&dddatanam (drop = aesoc aedecod page indent trt_99:
+data tfl.&dddatanam  (drop = aesoc aedecod page indent trt_99:
                       rename = (trt_0_npp = col1 trt_54_npp = col3 trt_81_npp = col5
                                 trt_0_ev  = col2 trt_54_ev  = col4 trt_81_ev  = col6
                                 soc_pt_disp = rowlbl1 ));
@@ -286,15 +286,34 @@ data tflw.&dddatanam (drop = aesoc aedecod page indent trt_99:
 run;
 
 
-%p_rtfCourier();
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
 title; footnote;
 ods listing close;
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 
 /* Titles and footnotes for PROC REPORT */
-title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
 title2 justify=l "Population: Safety" ;
 title3 justify=c "Table &tflid";
 title4 justify=c "Summary of Treatment-Emergent Adverse events leading to death by System Organ Class and Preferred term" ;
@@ -305,9 +324,9 @@ footnote3 justify=l "Total Events represent the total number of times an event w
 footnote4 justify=l "Percentages are based on the number of subjects in the safety population within each treatment group." ;
 footnote5 justify=l "TEAE= Treatment-Emergent Adverse Event, MedDRA= Medical Dictionary for Regulatory Activities." ;
 footnote6 ;
-footnote7 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+footnote7 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 proc report data = final1 split = '~'
-            style = rtfCourier
+            style = pdfstyle
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
             style(header) = {just = c}
@@ -356,7 +375,7 @@ proc report data = final1 split = '~'
 
             
     run;
-ods rtf close;
+ods pdf close;
 
 **** END OF USER DEFINED CODE **;
 

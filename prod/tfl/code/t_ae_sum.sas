@@ -1,12 +1,12 @@
-﻿/*****************************************************************************\
+/*****************************************************************************\
 *  ____                  _
 * |  _ \  ___  _ __ ___ (_)_ __   ___
 * | | | |/ _ \| '_ ` _ \| | '_ \ / _ \
 * | |_| | (_) | | | | | | | | | | (_) |
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
-* Sponsor              : C999
-* Study                : PILOT01
+* Sponsor              : Domino
+* Study                : H2QMCLZZT
 * Program              : t_ae_sum.SAS
 * Purpose              : Create summary of teaes for safety population
 * ____________________________________________________________________________
@@ -59,7 +59,7 @@ run;
 /*===========================================================================*/
 
 /* Big N counts */
-%u_pop(inds = adamw.adsl, trtvarn = trt01an, mvpre = POP, where = saffl = 'Y')
+%u_pop(inds = adam.adsl, trtvarn = trt01an, mvpre = POP, where = saffl = 'Y')
 
 /* Creating treatment related flag, subsetting by teae and analysis set, joining on N */
 proc sql;
@@ -68,7 +68,7 @@ proc sql;
            case when upcase(a.aerel) in &relterms. then 'Y'
                else 'N' end as aerelfl label = 'Treatement related AE flag' 
 
-    from adamw.adae a left join upop_counts b 
+    from adam.adae a left join upop_counts b 
            on a.trtan = b.trtvarn
     where a.saffl = 'Y' & a.trtemfl = 'Y'
     order by a.usubjid, a.trta, Ncount, a.aeseq
@@ -110,7 +110,7 @@ run;
 proc sql;
     create table template as
     select a.*, b.*
-    from temp_rows a, (select distinct trt01a as trta, trt01an as trtan from adamw.adsl) b
+    from temp_rows a, (select distinct trt01a as trta, trt01an as trtan from adam.adsl (where = (trt01an ^= .))) b
     ;
 
     /* Merge counts onto template - filling in any missings as zeros */
@@ -148,26 +148,47 @@ proc transpose prefix = trt_ delimiter = _ data = counts_T out = counts_TT (drop
     var value;
 run;
 
-%p_mcrAddPageVar(dataset_in = counts_TT, dataset_out = final, txt = flaglab, txt_col_width = 40, max_rows_per_page = 20)
+%p_mcraddpagevar(dataset_in = counts_TT, dataset_out = final, txt = flaglab, txt_col_width = 40, max_rows_per_page = 20)
 /*===========================================================================*/
 /*   Output files                                                            */
 /*===========================================================================*/
 
 /* Output the dddata */
-data tflw.&dddatanam;
+data tfl.&dddatanam;
     set final;
 run;
 
+proc template;
+	define style styles.pdfstyle;
+		parent = styles.journal;
+		replace fonts /
+			'TitleFont' = ("Courier new",9pt) /* Titles from TITLE statements */
+			'TitleFont2' = ("Courier new",9pt) /* Procedure titles ("The _____ Procedure")*/
+			'StrongFont' = ("Courier new",9pt)
+			'EmphasisFont' = ("Courier new",9pt)
+			'headingEmphasisFont' = ("Courier new",9pt)
+			'headingFont' = ("Courier new",9pt) /* Table column and row headings */
+			'docFont' = ("Courier new",9pt) /* Data in table cells */
+			'footFont' = ("Courier new",9pt) /* Footnotes from FOOTNOTE statements */
+			'FixedEmphasisFont' = ("Courier new",9pt)
+			'FixedStrongFont' = ("Courier new",9pt)
+			'FixedHeadingFont' = ("Courier new",9pt)
+			'BatchFixedFont' = ("Courier new",9pt)
+			'FixedFont' = ("Courier new",9pt);
+	end;
+run;
+
+
 /* Create rtf output */
-%p_rtfCourier();
+
 title; footnote;
 
 options orientation = landscape nodate nonumber;
-ods rtf file = "&__env_runtime.&__delim.prod&__delim.tfl&__delim.output&__delim.&outname..rtf" style = rtfCourier ;
+ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar = '|';
 
     /* Titles and footnotes for PROC REPORT */
-    title1 justify=l "Protocol: CDISCPILOT01" j=r "Page |{thispage} of |{lastpage}" ;
+    title1 justify=l "Protocol: &__PROTOCOL." j=r "Page |{thispage} of |{lastpage}" ;
     title2 justify=l "Population: Safety" ;
     title3 justify=c "Table &tflid";
     title4 justify=c "Overview of Treatment-Emergent Adverse events" ;
@@ -177,10 +198,10 @@ ods escapechar = '|';
     footnote3 justify=l "Percentages are based on the number of subjects in the safety population within each treatment group." ;
     footnote4 justify=l "TEAE= Treatment-Emergent Adverse Event, MedDRA= Medical Dictionary for Regulatory Activities." ;
     footnote5 ;
-    footnote6 justify=l "Source: &__full_path, %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
+    footnote6 justify=l "Project: &__PROJECT_NAME. Datacut: &__DCUTDTC. File: &__prog_path/&__prog_name..&__prog_ext , %sysfunc(date(),date9.) %sysfunc(time(),tod5.)" ;
 
-    proc report data = tflw.&dddatanam split = '~'
-            style = rtfCourier
+    proc report data = tfl.&dddatanam split = '~'
+            style = pdfstyle
             style(report) = {width=100%} 
             style(column) = {asis = on just = l}
             style(header) = {just = c}
@@ -221,7 +242,7 @@ ods escapechar = '|';
             
     run;
     
-ods rtf close; 
+ods pdf close; 
 title; footnote;
 
 
