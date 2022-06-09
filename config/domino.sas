@@ -42,7 +42,7 @@
 * Assumptions: 
 * - Must be run on the Domino platform (assumes Domino environment vars)
 * ____________________________________________________________________________
-* PROGRAM HISTORY                                                         
+* PROGRAM HISTORY                                     fu                    
 *  2022-06-06  |   Stuart.Malcolm  | Program created
 * ----------------------------------------------------------------------------
 *  YYYYMMDD  |  username        | ..description of change..         
@@ -67,15 +67,18 @@
 %global __full_path;     * full path and filename ;
 %global __runmode;       * INTERACTIVE or BATCH (or UNKNOWN);
 
+* ==================================================================;
 * grab the environment varaibles that we need to create pathnames;
+* ==================================================================;
 %let __WORKING_DIR  = %sysget(DOMINO_WORKING_DIR);
 %let __PROJECT_NAME = %sysget(DOMINO_PROJECT_NAME);
 %let __DCUTDTC      = %sysget(DCUTDTC);
-
 * runtime check that e.g. DCUTDTC is not missing;
 %if &__DCUTDTC. eq %str() %then %put %str(ER)ROR: Envoronment Variable DCUTDTC not set;
 
+* ==================================================================;
 * extract the protocol and project type from the project name;
+* ==================================================================;
 %if %sysfunc(find(&__PROJECT_NAME.,_)) ge 1 %then %do;
   %let __PROTOCOL     = %scan(&__PROJECT_NAME.,1,'_');
   %let __PROJECT_TYPE = %scan(&__PROJECT_NAME.,2,'_');
@@ -84,8 +87,9 @@
   %put %str(ER)ROR: Project Name (DOMINO_PROJECT_NAME) ill-formed. Expecting <PROTOCOL>_<TYPE> ;
 %end;
 
+* ==================================================================;
 * define library locations - these are dependent on the project type;
-* ------------------------------------------------------------------;
+* ==================================================================;
 
 * SDTM ;
 * ------------------------------------------------------------------;
@@ -116,41 +120,47 @@
   libname TFLQC "/mnt/data/TFLQC";
 %end;
 
-* ------------------------------------------------------------------;
+* ==================================================================;
 * Set SASAUTOS to search for shared macros ;
-* ------------------------------------------------------------------;
+* ==================================================================;
 options
   MAUTOSOURCE
   MAUTOLOCDISPLAY 
   sasautos=("/mnt/code/share/macros",SASAUTOS) ;
 
-* ------------------------------------------------------------------;
+* ==================================================================;
 * Determine if we are running Interactive or Batch ;
-* ------------------------------------------------------------------;
+* ==================================================================;
 
 * default position is that we dont know how program is running;
 %let __runmode=UNKNOWN;
 
+%* ------------------------------------------------------------------;
+%* Are we running in INTERACTIVE mode? ;
 %* Check for macro var _SASPROGRAMFILE. only present in SAS Studio ;
+%* ------------------------------------------------------------------;
    %if %symexist(_SASPROGRAMFILE) %then %do;
       %let __full_path = %str(&_SASPROGRAMFILE.);
       %let __runmode=INTERACTIVE;
       %put %str(TR)ACE: (domino.sas) Running in SAS Studio.;
    %end;
 
+%* ------------------------------------------------------------------;
+%* Are we running in BATCH mode? ;
 %* Check for Operating System parameter SYSIN. This parameter indicates batch execution ;
+%* ------------------------------------------------------------------;
    %else %if %quote(%sysfunc(getoption(sysin))) ne %str() %then %do;
       %let __full_path = %quote(%sysfunc(getoption(sysin)));
       %let __runmode=BATCH;
       %put %str(TR)ACE: (domino.sas) Running in BATCH SAS.;
    %end;
 
-%if &__full_path eq %str() %then %put %str(ER)ROR: Cannot determine program name;
+%* Runtime check that we can identify runtime mode;
+%if &__full_path eq %str() %then %put %str(WAR)NING: Cannot determine program name;
 
 * ------------------------------------------------------------------;
 * get program name, path and extension ;
 * ------------------------------------------------------------------;
-
 %local filename;
 %* scan from right to left for first backslash. ;
 %* everything to the right of that slash is filename with extension. ;
@@ -166,12 +176,22 @@ options
 %* everything after the period is the extension. ;
 %let __prog_ext = %scan(&filename, 2, .);
 
+* ==================================================================;
+* Redirect log files (BATCH MODE ONLY);
+* ==================================================================;
+%if &__runmode eq %str(BATCH) %then %do;
+  * Redirect SAS LOG files when in batch mode;
+  PROC PRINTTO LOG="/mnt/artifacts/logs/&__prog_name..log";
+%end;
+
 %mend __setup;
 * invoke the setup macro - so user program only needs to include this file;
 %__setup;
 
+* ==================================================================;
 * write to log for traceability ;
 * this is done outside the setup macro to ensure global vars are defined;
+* ==================================================================;
 %put TRACE: (domino.sas) [__WORKING_DIR = &__WORKING_DIR.] ;
 %put TRACE: (domino.sas) [__PROJECT_NAME = &__PROJECT_NAME.];
 %put TRACE: (domino.sas) [__DCUTDTC = &__DCUTDTC.];
