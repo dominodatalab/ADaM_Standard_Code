@@ -118,7 +118,7 @@ edish_data <- merge(edish_data_prep, edish_summary, by = "USUBJID", all = TRUE)
 
 # save and output as a PNG
 setwd("/mnt/artifacts/results")
-pdf(file = "edish.pdf", height = 6, width = 12)
+pdf(file = "edish.pdf", height = 8, width = 14)
 
 # plot
 ggplot(data = edish_data) +
