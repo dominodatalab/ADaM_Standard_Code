@@ -94,7 +94,7 @@ data &pop.2 ;
    end ;
 run ;
 
-proc transpose data=&pop.2
+proc transpose data=&pop.2 (where = (trt01pn ^= .))
                out= tran_&pop. 
                prefix=_;
    var &pop.2; /*numerical vars that were across but now down*/
@@ -109,7 +109,7 @@ run ;
 
 data rep1 ;
    set tran_: ;
-   length text $200 TRT1-TRT4 $100 ;
+   length text $100 TRT1-TRT4 $100 ;
    if _NAME_='ittfl2' then do ;text='Intent-to-treat set [a]'; order=1; end ;
    else if _NAME_='saffl2' then do ;text='Safety set [b]'; order=2; end ;
    else if _NAME_='efffl2' then do ;text='Efficacy set [c]'; order=4; end ;
@@ -178,7 +178,7 @@ run ;
 %let numtrt=4 ;
 
 
-data freq ;
+data freq (where = (trt01pn ^= .));
    set total ;
    if trt01pn=0 then trt01pn2=1 ;
    else if trt01pn=54 then trt01pn2=2 ;
@@ -247,6 +247,7 @@ data _null_ ;
 run ;
 
 data rep2 ;
+length text $100;
    set rep1 
        no_trt2
        comp24 (drop= counttype complfl _name_ )
@@ -287,10 +288,9 @@ proc template;
 run;
 
 
-
 options orientation=landscape ;
 
-ods listing close;
+
 ods pdf file = "/mnt/artifacts/results/&outname..pdf" style = pdfstyle;
 ods escapechar="~" ;
 
@@ -340,7 +340,6 @@ run;
 
 *------------------------------------------------------------------------------;
 ODS pdf close;
-ODS listing;
 title; footnote;
 
 
