@@ -117,7 +117,7 @@ edish_data <- merge(edish_data_prep, edish_summary, by = "USUBJID", all = TRUE)
 #---------- the edish plot
 
 # save and output as a PNG
-setwd("/mmt/artifacts/  results")
+setwd("/mnt/artifacts/results")
 png(file = "edish.png", height = (5*480), width = 2*(5*480), res=400)
 
 # plot
