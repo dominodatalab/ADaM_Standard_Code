@@ -76,6 +76,3 @@ ggsurvplot(surv_curve,
 
 # Height of risk table
 dev.off() # Closes the plot and saves it as file
-
-# Height of risk table
-dev.off() # Closes the plot and saves it as file
