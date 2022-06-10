@@ -106,7 +106,6 @@ edish_summary <- edish_summary_pre %>%
                                                        NA))))))
 
 
-
 # get just the unique counts for status to be used as text on plot
 status_count <- unique(edish_summary[,c("status", "n", "x_lab", "y_lab")])
 
