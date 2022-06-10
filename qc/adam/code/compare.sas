@@ -46,28 +46,24 @@ run;
 
 proc sql;
 	create table diags1 as	
-	select count(distinct base) as count, 
-		   'Number of datasets' as label length = 25
+	select count(distinct base) as N_dset
 	from ___LIBALLCOMP;
 
 	create table diags2 as	
-	select count(distinct base) as count, 
-		   ifc(compstatus = 'Issues', 'Datasets with issues', 'Clean Datasets') as label  length = 25
-	from ___LIBALLCOMP
-	group by compstatus;
+	select  count(*) as N_allissues, count(distinct base) as N_dissues 
+	from ___LIBALLCOMP (where = (compstatus = 'Issues'));
 
 	create table diags3 as	
-	select count(*) as count, 
-		   'Total Issues' as label  length = 25
-	from ___LIBALLCOMP (where = (compstatus = 'Issues'));
+	select count(distinct base) as N_dclean
+	from ___LIBALLCOMP (where = (compstatus = 'Clean'));
 quit;
 
 data diags;
-	set diags1-diags3;
+	merge diags1-diags3;
 run;
 
 proc json out = '/mnt/code/dominostats.json' pretty;
-	export diags / nokeys;
+	export diags / nosastags;
 run;
 
 

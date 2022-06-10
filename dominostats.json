@@ -1,18 +1,8 @@
 [
-  [
-    10,
-    "Number of datasets"
-  ],
-  [
-    8,
-    "Clean Datasets"
-  ],
-  [
-    2,
-    "Datasets with issues"
-  ],
-  [
-    14,
-    "Total Issues"
-  ]
+  {
+    "N_dset": 10,
+    "N_allissues": 14,
+    "N_dissues": 2,
+    "N_dclean": 8
+  }
 ]
