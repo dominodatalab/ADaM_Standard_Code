@@ -41,10 +41,49 @@ run;
 %s_compare(base = ADAM._ALL_,
 		   comp = ADAMQC._ALL_,
 		   comprpt = '/mnt/artifacts/compare.pdf',
-		   prefix =);
+		   prefix =,
+		   tidyup = N);
+
+proc sql;
+	create table diags1 as	
+	select count(distinct base) as count, 
+		   'Number of datasets' as label length = 25
+	from ___LIBALLCOMP;
+
+	create table diags2 as	
+	select count(distinct base) as count, 
+		   ifc(compstatus = 'Issues', 'Datasets with issues', 'Clean Datasets') as label  length = 25
+	from ___LIBALLCOMP
+	group by compstatus;
+
+	create table diags3 as	
+	select count(*) as count, 
+		   'Total Issues' as label  length = 25
+	from ___LIBALLCOMP (where = (compstatus = 'Issues'));
+quit;
+
+data diags;
+	set diags1-diags3;
+run;
+
+proc json out = '/mnt/code/dominostats.json' pretty;
+	export diags / nokeys;
+run;
+
+
+ 
 
 
 
+
+
+
+%s_compare(base = ADAM.ADSL,
+		   comp = ADAMQC.ADSL,
+		   options = outbase outcomp outnoequal transpose);
+data gaps;
+	set _COMPY_DIFFS;
+	
 
 
 /*  */
