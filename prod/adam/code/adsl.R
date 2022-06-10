@@ -237,16 +237,19 @@ add_efffl <- function(.data, qs_dset = qs){
       )
     ) %>%
     filter(VISITNUM > 3 & (cat != "DROP")) %>%
-    group_by(USUBJID,VISITNUM) %>%
+    group_by(USUBJID) %>%
     mutate(
       EFFFL=if_else(n_distinct(cat) >= 2,"Y","N")
     ) %>%
-    ungroup() %>%
     select(USUBJID, EFFFL) %>%
-    distinct
+    distinct %>%
+    ungroup
   
   .data %>%
-    left_join(qs_efffl, by="USUBJID")
+    left_join(qs_efffl, by="USUBJID") %>%
+    mutate(
+      EFFFL=if_else(SAFFL == "N", "N", EFFFL)
+  )  
 }
 
 ## Completer flag
@@ -296,6 +299,8 @@ add_baseline_vs <- function(.data, vs_dset = vs) {
 # Code
 
 ADSL <- dm %>%
+  # drop screen failures
+  filter(ARM != "Screen Failure") %>%
   # Derive treatment decode vars & treatment start date
   mutate(
     TRT01P = ARM,
@@ -410,6 +415,7 @@ ADSL <- dm %>%
 # Labels
 
 walk2(names(ADSL_vars), ADSL_vars, ~ {attr(ADSL[[.x]], "label") <<- .y})
+attr(ADSL, "label") <- "Subject-Level Analysis Dataset"
 
 # export
 haven::write_xpt(ADSL, "/mnt/data/ADAM/adsl.xpt")
