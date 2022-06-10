@@ -1,21 +1,18 @@
-{
-  "SASJSONExport": "1.0 NOKEYS PRETTY",
-  "SASTableData+DIAGS": [
-    [
-      10,
-      "Number of datasets"
-    ],
-    [
-      8,
-      "Clean Datasets"
-    ],
-    [
-      2,
-      "Datasets with issues"
-    ],
-    [
-      14,
-      "Total Issues"
-    ]
+[
+  [
+    10,
+    "Number of datasets"
+  ],
+  [
+    8,
+    "Clean Datasets"
+  ],
+  [
+    2,
+    "Datasets with issues"
+  ],
+  [
+    14,
+    "Total Issues"
   ]
-}
+]
