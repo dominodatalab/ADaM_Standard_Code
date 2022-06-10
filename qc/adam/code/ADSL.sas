@@ -45,10 +45,11 @@
 * -----------------------------------------------------------------------------------------------------------------;
 * Read in data from DM and exclude screen failures;
 data dm (keep = studyid usubjid subjid siteid arm rfstdtc rfendtc rfxstdtc rfxendtc age ageu race sex ethnic dthfl dthdtc dthdt);
-  set sdtm.dm (where = (upcase(arm) ne "SCREEN FAILURE"));
+	set sdtm.dm (where = (upcase(arm) ne "SCREEN FAILURE"));
 
   if (length(dthdtc) ge 10) then dthdt = input(substr(dthdtc,1,10), e8601da.);
 run;
+
 
 * -----------------------------------------------------------------------------------------------------------------;
 * Read in data from EX to derive last exposure date;
@@ -171,8 +172,6 @@ run;
 * Derive variables from merged data;
 data adsl2;
   set adsl1;
-
-  length sitegr1 trt01p trt01a eosstt dcsreas dcsreapl agegr1 randfl ittfl saffl efffl complfl comp8fl comp16fl comp26fl bmigr1 durdsgr1 $ 200;
 
   * Pool sites into SITEGR1;
   if (siteid not in ("702","706","707","711","714","715","717")) then sitegr1 = trim(left(siteid));
@@ -347,70 +346,73 @@ run;
 
 data adamqc.adsl (label = "Subject-Level Analysis Dataset");
   retain &keepvars.;
-  set adsl (keep = &keepvars.);
+  
 
-  label
-    STUDYID  = "Study Identifier"
-    USUBJID  = "Unique Subject Identifier"
-    SUBJID   = "Subject Identifier for the Study"
-    SITEID   = "Study Site Identifier"
-    SITEGR1  = "Pooled Site Group 1"
-    ARM      = "Description of Planned Arm"
-    TRT01P   = "Planned Treatment for Period 01"
-    TRT01PN  = "Planned Treatment for Period 01 (N)"
-    TRT01A   = "Actual Treatment for Period 01"
-    TRT01AN  = "Actual Treatment for Period 01 (N)"
-    RFSTDTC  = "Subject Reference Start Date/Time"
-    RFENDTC  = "Subject Reference End Date/Time"
-    RFXSTDTC = "Date/Time of First Study Treatment"
-    RFXENDTC = "Date/Time of Last Study Treatment"
-    LSTEXDTC = "Date/Time of Last End of Exposure"
-    EOSSTT   = "End of Study Status"
-    EOSDT    = "End of Study Date"
-    EOSDY    = "End of Study Day"
-    DCSREAS  = "Reason for Discontinuation from Study"
-    DCSREAPL = "Reason for Disc from Study (Pooled)"
-	RANDDT   = "Date of Randomization"
-    TRTSDT   = "Date of First Exposure to Treatment"
-    TRTEDT   = "Date of Last Exposure to Treatment"
-    TRTDURD  = "Total Treatment Duration (Days)"
-    CUMDOSE  = "Cumulative Dose (as planned)"
-    AVGDD    = "Avg Daily Dose (as planned)"
-    AGE      = "Age"
-    AGEGR1   = "Pooled Age Group 1"
-    AGEGR1N  = "Pooled Age Group 1 (N)"
-    AGEU     = "Age Units"
-    RACE     = "Race"
-    RACEN    = "Race (N)"
-    SEX      = "Sex"
-    ETHNIC   = "Ethnicity"
-    RANDFL   = "Randomized Population Flag"
-    ITTFL    = "Intent-To-Treat Population Flag"
-    SAFFL    = "Safety Population Flag"
-    EFFFL    = "Efficacy Population Flag"
-    COMPLFL  = "Completers Population Flag"
-    COMP8FL  = "Completers of Week 8 Population Flag"
-    COMP16FL = "Completers of Week 16 Population Flag"
-    COMP26FL = "Completers of Week 26 Population Flag"
-    DTHFL    = "Subject Death Flag"
-	DTHDTC   = "Date/Time of Death"
-    DTHDT    = "Date of Death"
-    BMIBL    = "Baseline BMI (kg/m2)"
-    BMIGR1   = "Pooled Baseline BMI Group 1"
-    HEIGHTBL = "Baseline Height (cm)"
-    WEIGHTBL = "Baseline Weight (kg)"
-    EDLEVEL  = "Years of Education Completed"
-    DISONDT  = "Date of Disease Onset"
-    VIS1DT   = "Date of Visit 1"
-    DURDISM  = "Duration of Disease (Months)"
-    DURDSGR1 = "Pooled Disease Duration Group 1"
-    VISNUMEN = "End of Trt Visit (Vis 12 or Early Term.)"
-    BLDSEV   = "Baseline Disease Severity (MMSE)"
+  attrib
+    STUDYID  length = $12 label = "Study Identifier"
+    USUBJID  length = $11 label = "Unique Subject Identifier"
+    SUBJID   length = $4  label = "Subject Identifier for the Study"
+    SITEID   length = $3  label = "Study Site Identifier"
+    SITEGR1  length = $3  label = "Pooled Site Group 1"
+    ARM      length = $20 label = "Description of Planned Arm"
+    TRT01P   length = $20 label = "Planned Treatment for Period 01"
+    TRT01PN               label = "Planned Treatment for Period 01 (N)"
+    TRT01A   length = $20 label = "Actual Treatment for Period 01"
+    TRT01AN               label = "Actual Treatment for Period 01 (N)"
+    RFSTDTC  length = $10 label = "Subject Reference Start Date/Time"
+    RFENDTC  length = $10 label = "Subject Reference End Date/Time"
+    RFXSTDTC length = $20 label = "Date/Time of First Study Treatment"
+    RFXENDTC length = $20 label = "Date/Time of Last Study Treatment"
+    LSTEXDTC length = $10 label = "Date/Time of Last End of Exposure"
+    EOSSTT   length = $12 label = "End of Study Status"
+    EOSDT                 label = "End of Study Date"
+    EOSDY                 label = "End of Study Day"
+    DCSREAS  length = $18 label = "Reason for Discontinuation from Study"
+    DCSREAPL length = $27 label = "Reason for Disc from Study (Pooled)"
+	RANDDT                label = "Date of Randomization"
+    TRTSDT                label = "Date of First Exposure to Treatment"
+    TRTEDT                label = "Date of Last Exposure to Treatment"
+    TRTDURD               label = "Total Treatment Duration (Days)"
+    CUMDOSE               label = "Cumulative Dose (as planned)"
+    AVGDD                 label = "Avg Daily Dose (as planned)"
+    AGE                   label = "Age"
+    AGEGR1   length = $5  label = "Pooled Age Group 1"
+    AGEGR1N               label = "Pooled Age Group 1 (N)"
+    AGEU     length = $5  label = "Age Units"
+    RACE     length = $78 label = "Race"
+    RACEN                 label = "Race (N)"
+    SEX      length = $1  label = "Sex"
+    ETHNIC   length = $25 label = "Ethnicity"
+    RANDFL   length = $1  label = "Randomized Population Flag"
+    ITTFL    length = $1  label = "Intent-To-Treat Population Flag"
+    SAFFL    length = $1  label = "Safety Population Flag"
+    EFFFL    length = $1  label = "Efficacy Population Flag"
+    COMPLFL  length = $1  label = "Completers Population Flag"
+    COMP8FL  length = $1  label = "Completers of Week 8 Population Flag"
+    COMP16FL length = $1  label = "Completers of Week 16 Population Flag"
+    COMP26FL length = $1  label = "Completers of Week 26 Population Flag"
+    DTHFL    length = $1  label = "Subject Death Flag"
+	DTHDTC   length = $10 label = "Date/Time of Death"
+    DTHDT                 label = "Date of Death"
+    BMIBL                 label = "Baseline BMI (kg/m2)"
+    BMIGR1   length = $6  label = "Pooled Baseline BMI Group 1"
+    HEIGHTBL              label = "Baseline Height (cm)"
+    WEIGHTBL              label = "Baseline Weight (kg)"
+    EDLEVEL               label = "Years of Education Completed"
+    DISONDT               label = "Date of Disease Onset"
+    VIS1DT                label = "Date of Visit 1"
+    DURDISM               label = "Duration of Disease (Months)"
+    DURDSGR1 length = $4  label = "Pooled Disease Duration Group 1"
+    VISNUMEN              label = "End of Trt Visit (Vis 12 or Early Term.)"
+    BLDSEV                label = "Baseline Disease Severity (MMSE)"
   ;
+
+	set adsl (keep = &keepvars.);
   format 
-    eosdt trtsdt trtedt disondt vis1dt dthdt date9.
+    trtsdt trtedt disondt vis1dt dthdt date9.
   ;
 run;
+
 
 **** END OF USER DEFINED CODE **;
 
