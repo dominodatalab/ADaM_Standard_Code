@@ -54,6 +54,7 @@ surv_curve <- survfit(surv_trtp~ TRTA,  data = adtte, conf.type= c("log-log")) #
 
 #---------------------------- kaplan meier curve -------------------------------
 # Create KM plot and output as a PNG
+setwd("/mnt/artifacts/results")
 pdf(file = "vet_kmcurve_R.pdf", height = 15, width = 15, onefile = FALSE) # need onefile = FALSE so that it prints on first page
 ggsurvplot(surv_curve,          
            title = "KM Curve of Dermatological Events by Assigned Treatment",       
