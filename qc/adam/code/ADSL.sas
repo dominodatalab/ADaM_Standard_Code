@@ -69,7 +69,7 @@ run;
 
 * -----------------------------------------------------------------------------------------------------------------;
 * Read in data from DS to get end of study information;
-data ds (keep = usubjid visitnum dsdecod);
+data ds (keep = usubjid visitnum dsdecod dscat);
   set sdtm.ds (where = (upcase(dscat) eq "DISPOSITION EVENT" and upcase(dsdecod) ne "SCREEN FAILURE"));
 run;
 
@@ -195,8 +195,8 @@ data adsl2;
   end;
 
   * End of study status;
-  if (upcase(dsdecod) eq "COMPLETED") then eosstt = "COMPLETED";
-  else eosstt = "DISCONTINUED";
+  if       (upcase(dsdecod) eq "COMPLETED" & upcase(dscat) = 'DISPOSITION EVENT') then eosstt = "COMPLETED";
+  else if  (upcase(dsdecod) ^= "COMPLETED" & upcase(dscat) = 'DISPOSITION EVENT') then eosstt = "DISCONTINUED";
 
   * Reason for discontinuation;
   if (upcase(dsdecod) ne "COMPLETED") then do;
@@ -285,7 +285,7 @@ data adsl2;
 
   if (bmibl ne .) then do;
     if (bmibl lt 25)                        then bmigr1  = "<25";
-	else if (bmibl ge 25) and (bmibl lt 30) then bmigr1  = "25->30";
+	else if (bmibl ge 25) and (bmibl lt 30) then bmigr1  = "25-<30";
 	else if (bmibl ge 30)                   then bmigr1  = ">=30";
   end;
 
