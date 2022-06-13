@@ -171,6 +171,7 @@ run;
 * -----------------------------------------------------------------------------------------------------------------;
 * Derive variables from merged data;
 data adsl2;
+	length dcsreapl $27 dcsreas $28 eosstt $12 sitegr1 $3 trt01p trt01a $20 randfl ittfl saffl efffl complfl comp8fl comp16fl comp26fl $1 agegr1 $5 bmigr1 $6 durdsgr1 $4;
   set adsl1;
 
   * Pool sites into SITEGR1;
