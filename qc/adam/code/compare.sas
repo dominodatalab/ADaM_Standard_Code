@@ -37,68 +37,41 @@
 data adam.adsl;
 	set adsl;
 run;
-
+/* Compare all */
 %s_compare(base = ADAM._ALL_,
 		   comp = ADAMQC._ALL_,
 		   comprpt = '/mnt/artifacts/compare.pdf',
-		   prefix =);
+		   prefix =,
+		   tidyup = N);
 
+/* json file from results */
+proc sql;
+	create table diags1 as	
+	select count(distinct base) as N_dset
+	from ___LIBALLCOMP;
 
+	create table diags2 as	
+	select  count(*) as N_allissues, count(distinct base) as N_dissues 
+	from ___LIBALLCOMP (where = (compstatus = 'Issues'));
 
+	create table diags3 as	
+	select count(distinct base) as N_dclean
+	from ___LIBALLCOMP (where = (compstatus = 'Clean'));
+quit;
 
+data diags;
+	merge diags1-diags3;
+run;
 
-/*  */
-/* Obtain xpt file names  */
-/* data xptnames (where = (scan(strip(fname),2,'.') = 'xpt')); */
-/* 	length fref $8 fname $200; */
-/* 	tmp = filename(fref,'/mnt/data/ADAM'); */
-/* 	tmp = dopen(fref); */
-/* 	do i = 1 to dnum(tmp); */
-/* 		fname = dread(tmp,i); */
-/*  		output; */
-/* 	end; */
-/* 	tmp = dclose(tmp); */
-/* 	tmp = filename(fref); */
-/*     keep fname; */
-/* run; */
-/*  */
-/* create macro variable 'xpts' to capture all individual xpt file names */
-/* proc sql noprint; */
-/*     select strip(fname) into:xpts separated by ' ' */
-/*     from xptnames */
-/*     ; */
-/* quit; */
-/*  */
-/* loop through all individual files and add to adam as sas7bdat */
-/* %macro xpt_sas; */
-/*     %do i=1 %to %sysfunc(countw(&xpts)); */
-/* 		%let currnam = %scan(&xpts, &i, ' '); */
-/* 		%let currpth = %bquote('/mnt/data/ADAM/)&currnam %bquote('); */
-/* 		%xpt2loc(filespec=&currpth); */
-/* 		data ADAM.&currnam; */
-/* 			set &currnam; */
-/* 		run; */
-/* 	%end; */
-/* %mend xpt_sas; */
-/*  */
-/* %xpt_sas; */
+proc json out = "&__WORKING_DIR/dominostats.json" pretty;
+	export diags / nosastags;
+run;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Output results dataset */
+libname compare '/mnt/data/COMPARE';
+data compare.summary;
+	set ___LIBALLCOMP;
+run;
 
 
 
