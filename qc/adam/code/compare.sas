@@ -45,26 +45,22 @@ run;
 		   tidyup = N);
 
 /* json file from results */
-proc sql;
-	create table diags1 as	
-	select count(distinct base) as N_dset
+proc sql noprint;
+	select count(distinct base) into: all_ds
 	from ___LIBALLCOMP;
 
-	create table diags2 as	
-	select  count(*) as N_allissues, count(distinct base) as N_dissues 
+	select  count(*), count(distinct base) into :all_issues, :ds_issues 
 	from ___LIBALLCOMP (where = (compstatus = 'Issues'));
 
-	create table diags3 as	
-	select count(distinct base) as N_dclean
+	select count(distinct base) into: ds_clean
 	from ___LIBALLCOMP (where = (compstatus = 'Clean'));
 quit;
 
-data diags;
-	merge diags1-diags3;
-run;
-
 proc json out = "&__WORKING_DIR/dominostats.json" pretty;
-	export diags / nosastags;
+	write values "Number of Datasets" &all_ds;
+    write values "Clean Datasets" &ds_clean;
+    write values "Datasets with Issues" &ds_issues;
+    write values "Total number of Issues" &all_issues;
 run;
 
 /* Output results dataset */
