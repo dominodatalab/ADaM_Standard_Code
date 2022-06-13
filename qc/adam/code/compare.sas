@@ -63,7 +63,7 @@ data diags;
 	merge diags1-diags3;
 run;
 
-proc json out = '/mnt/code/dominostats.json' pretty;
+proc json out = "&__WORKING_DIR/dominostats.json" pretty;
 	export diags / nosastags;
 run;
 
