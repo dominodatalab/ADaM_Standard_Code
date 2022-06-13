@@ -30,6 +30,7 @@
 
 # Libs
 library(tidyverse)
+library(lubridate)
 library(admiral)
 
 # Data
@@ -121,13 +122,13 @@ TRTN <- c(
 
 AGEGR <- c("<65" = "1",
            "65-80" = "2",
-           "80" = "3")
+           ">80" = "3")
 
 RACEN <- c(
   "WHITE" = 1,
   "BLACK OR AFRICAN AMERICAN" = 2,
   "ASIAN" = 3,
-  "AMERICAN INDIAN OR ALASKA NATIVE" = 5
+  "AMERICAN INDIAN OR ALASKA NATIVE" = 6
 )
 
 DCSREAPL_FMT <- c("ADVERSE EVENT" = "Adverse Event", 
@@ -141,6 +142,13 @@ DCSREAPL_FMT <- c("ADVERSE EVENT" = "Adverse Event",
 )
 
 # User defined functions
+
+## SAS Round function: SAS's `round` does not round to even as per IEEE / IEC
+## This function implements a crude rounding
+sas_round <- function(x, digits = 1) {
+  mult <- 10^digits
+  floor((x * mult) + 0.5) / mult
+}
 
 ## SITEGR1 Derivation
 add_sitegr1 <- function(.data) {
@@ -168,9 +176,10 @@ add_lstexdtc <- function(.data,
     filter((EXDOSE == 0 & EXTRT == "PLACEBO") | EXDOSE > 0) %>%
     group_by(USUBJID) %>%
     mutate(EXESDT = convert_dtc_to_dt(EXENDTC),
-           LSTEXDTC = max(EXESDT)) %>%
+           LSTEXDT = max(EXESDT),
+           LSTEXDTC = as.character(LSTEXDT)) %>%
     ungroup %>%
-    select(USUBJID, LSTEXDTC) %>%
+    select(USUBJID, LSTEXDT, LSTEXDTC) %>%
     distinct
   
   .data %>%
@@ -194,15 +203,19 @@ add_cumdose <- function(.data, ex_data = ex) {
   ex_cumdose <- ex_data %>%
     left_join(.data, by = "USUBJID") %>%
     group_by(USUBJID) %>%
-    mutate(cumdose = if_else(
-      TRT01P == 0,
-      0,
-      EXDOSE * if_else(
-        is.na(EXENDY),
-        EXENDY - EXSTDY + 1,
-        as.numeric(TRTEDT - TRTSDT) + 1
-      )
-    )) %>%
+    mutate(
+      diffdose = if_else(
+        TRT01P == 0,
+        0,
+        EXENDY - EXSTDY + 1
+      ),
+      diffdose = if_else(
+        is.na(diffdose),
+        TRTEDT - TRTSDT + 1,
+        diffdose
+      ),
+      cumdose = EXDOSE * as.numeric(diffdose)
+    ) %>%
     summarize(CUMDOSE = sum(cumdose)) %>%
     ungroup %>%
     select(USUBJID, CUMDOSE) %>%
@@ -248,7 +261,7 @@ add_efffl <- function(.data, qs_dset = qs){
   .data %>%
     left_join(qs_efffl, by="USUBJID") %>%
     mutate(
-      EFFFL=if_else(SAFFL == "N", "N", EFFFL)
+      EFFFL=if_else(SAFFL == "N" | is.na(EFFFL), "N", EFFFL),
   )  
 }
 
@@ -282,13 +295,15 @@ add_baseline_vs <- function(.data, vs_dset = vs) {
       values_from = VSSTRESN
     ) %>%
     mutate(
-      BMIBL = round(WEIGHTBL / (HEIGHTBL / 100)^2,1),
-      BMIGR1 = cut(
+      HEIGHTBL = sas_round(HEIGHTBL,1),
+      WEIGHTBL = sas_round(WEIGHTBL,1),
+      BMIBL = sas_round(WEIGHTBL / (HEIGHTBL / 100)^2,1),
+      BMIGR1 = as.character(cut(
         x = BMIBL,
         breaks = c(-Inf, 25, 30, Inf),
         labels = c("<25", "25-<30", ">=30"),
         right = FALSE
-      )
+      )),
     ) %>%
     distinct
   
@@ -304,7 +319,7 @@ ADSL <- dm %>%
   # Derive treatment decode vars & treatment start date
   mutate(
     TRT01P = ARM,
-    TRT01A = ACTARM,
+    TRT01A = ARM,
     TRT01PN = recode(TRT01P, !!!TRTN),
     TRT01AN = recode(TRT01A, !!!TRTN),
     TRTSDT = convert_dtc_to_dt(RFXSTDTC),
@@ -313,7 +328,7 @@ ADSL <- dm %>%
   ) %>%
   # Derive LSTEXDTC, TRTEDT and TRTDURD
   add_lstexdtc %>%
-  mutate(TRTEDT = if_else(is.na(LSTEXDTC), EOSDT, LSTEXDTC),
+  mutate(TRTEDT = if_else(is.na(LSTEXDT), EOSDT, LSTEXDT),
          TRTDURD = as.numeric(TRTEDT - TRTSDT) + 1) %>%
   # Derive end of study status
   derive_var_disposition_status(
@@ -328,7 +343,7 @@ ADSL <- dm %>%
   add_randdt %>%
   # cumdose
   add_cumdose %>%
-  mutate(AVGDD = CUMDOSE / TRTDURD) %>%
+  mutate(AVGDD = sas_round(CUMDOSE / TRTDURD, 1)) %>%
   # agegr1 and racen
   mutate(
     AGEGR1N = cut(
@@ -336,7 +351,7 @@ ADSL <- dm %>%
       breaks = c(-Inf, 64, 80, Inf),
       labels = c(1, 2, 3)
     ),
-    AGEGR1 = fct_recode(AGEGR1N, !!!AGEGR),
+    AGEGR1 = as.character(fct_recode(AGEGR1N, !!!AGEGR)),
     RACEN = recode(RACE,!!!RACEN)
   ) %>%
   # sitegr1
@@ -385,13 +400,13 @@ ADSL <- dm %>%
   ) %>% 
   # Duration of disease 
   mutate(
-    DURDISM = as.numeric(VIS1DT - DISONDT)/30.417,
-    DURDSGR1 = cut(
+    DURDISM = floor(time_length(interval(DISONDT,VIS1DT),"months")),
+    DURDSGR1 = as.character(cut(
       x = DURDISM,
       breaks = c(-Inf, 12, Inf),
       labels = c("<12", ">=12"),
       right = FALSE
-    )
+    ))
   ) %>%
   # End of treatment visit. 
   left_join(
@@ -416,6 +431,13 @@ ADSL <- dm %>%
 
 walk2(names(ADSL_vars), ADSL_vars, ~ {attr(ADSL[[.x]], "label") <<- .y})
 attr(ADSL, "label") <- "Subject-Level Analysis Dataset"
+
+# Date vars correct format
+
+ADSL %>% 
+  select(ends_with("DT")) %>%
+  colnames %>%
+  walk(~ {attr(ADSL[[.x]], "format.sas") <<- "DATE9"})
 
 # export
 haven::write_xpt(ADSL, "/mnt/data/ADAM/adsl.xpt")
