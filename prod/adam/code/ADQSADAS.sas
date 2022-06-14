@@ -53,7 +53,7 @@ run;
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid ittfl efffl trt01p trt01pn trtsdt randdt rename = (trt01p = trtp trt01pn = trtpn));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get questionnaire data and filter on ALZHEIMERS DISEASE ASSESSMENT SCALE;
@@ -390,7 +390,7 @@ data final;
   if not first.adt then put "Check order: " usubjid= paramcd= avisitn= visitnum=;
 run;
 
-data adamw.adqsadas (label = "ADAS-Cog Analysis Dataset");
+data adam.adqsadas (label = "ADAS-Cog Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

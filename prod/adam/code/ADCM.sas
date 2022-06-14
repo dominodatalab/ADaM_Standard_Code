@@ -66,7 +66,7 @@ run;
 %p_suppadd (inds=cm,domain=cm,outds=cmplus);
 
 /*Merging ADSL with CM to get Key Variables from ADSL*/
-proc sort data=adamw.adsl out=adsl;
+proc sort data=adam.adsl out=adsl;
         by usubjid;
 run;
 data cm1;
@@ -140,7 +140,7 @@ proc sort data=cm2 out=final;
 run;
 
 
-data adamw.adcm (label = "Concomitant Medications Analysis Dataset");
+data adam.adcm (label = "Concomitant Medications Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

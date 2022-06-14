@@ -40,13 +40,13 @@
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid saffl trt01a trt01an trtsdt randdt rename = (trt01a = trta trt01an = trtan));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get data from ADLB;
 data adlb (keep = usubjid adt adtm atm ady visit visitnum avisit avisitn r2a1lo r2a1hi a1lo a1hi anl01fl ontrtfl lvotfl 
                   paramn paramcd param aval avalc ablfl base basec crit1 crit1fl);
-  set adamw.adlb;
+  set adam.adlb;
   if (paramcd in ("ALT","AST","BILI")) and (basetype eq "VISIT 1");
 
   length crit1 crit1fl $ 200;
@@ -213,7 +213,7 @@ data final;
   if not first.avisitn then put "Check order: " usubjid= paramn= avisitn=;
 run;
 
-data adamw.adlbhy (label = "Laboratory Hy Law Analysis Dataset");
+data adam.adlbhy (label = "Laboratory Hy Law Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

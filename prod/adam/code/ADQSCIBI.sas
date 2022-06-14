@@ -53,7 +53,7 @@ run;
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid ittfl efffl trt01p trt01pn trtsdt randdt rename = (trt01p = trtp trt01pn = trtpn));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get questionnaire data and filter on CIBIC+;
@@ -268,7 +268,7 @@ data final;
   if not first.adt then put "Check order: " usubjid= paramcd= avisitn= visitnum=;
 run;
 
-data adamw.adqscibi (label = "CIBIC+ Analysis Dataset");
+data adam.adqscibi (label = "CIBIC+ Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

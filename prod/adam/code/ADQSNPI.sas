@@ -63,7 +63,7 @@ run;
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid ittfl efffl trt01p trt01pn trtsdt randdt rename = (trt01p = trtp trt01pn = trtpn));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get questionnaire data and filter on NPI;
@@ -287,7 +287,7 @@ data final;
   if not first.visitnum then put "Check order: " usubjid= paramcd= avisitn= visitnum=;
 run;
 
-data adamw.adqsnpi (label = "NPI-X Item Analysis Dataset");
+data adam.adqsnpi (label = "NPI-X Item Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

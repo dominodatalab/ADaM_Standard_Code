@@ -42,7 +42,7 @@
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid saffl trt01a trt01an trtsdt randdt rename = (trt01a = trta trt01an = trtan));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get unique tests and units for derivation of PARAM;
@@ -466,7 +466,7 @@ data final;
   if not first.adt then put "Check order: " usubjid= paramcd= avisitn= basetype=;
 run;
 
-data adamw.adlb (label = "Laboratory Analysis Dataset");
+data adam.adlb (label = "Laboratory Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

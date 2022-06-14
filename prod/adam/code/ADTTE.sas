@@ -41,7 +41,7 @@
 
 * Get dermatologic events from ADAE;
 data adae (keep = usubjid cq01nam astdt);
-  set adamw.adae;
+  set adam.adae;
   if (cq01nam eq "DERMATOLOGIC EVENTS") and (trtemfl eq "Y");
 run;
 
@@ -59,7 +59,7 @@ run;
 * Merge with subjects in ADSL to create a dataset with 1 record per subject;
 data adsl (keep   = studyid siteid usubjid trt01a trt01an age agegr1 agegr1n race racen sex saffl trtsdt trtedt dthdt eosdt eosstt
            rename = (trt01a = trta trt01an = trtan));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 data all;
@@ -124,7 +124,7 @@ data final;
   aseq + 1;
 run;
 
-data adamw.adtte (label = "Time to Event Analysis Dataset");
+data adam.adtte (label = "Time to Event Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

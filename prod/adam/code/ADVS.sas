@@ -41,7 +41,7 @@
 
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid trt01a trt01an trtsdt rename = (trt01a = trta trt01an = trtan));
-  set adamw.adsl;
+  set adam.adsl;
 run;
 
 * Get vital sign data;
@@ -213,7 +213,7 @@ data final;
   if not first.avisitn then put "Check order: " usubjid= paramcd= avisitn= atptn=;
 run;
 
-data adamw.advs (label = "Vital Signs Analysis Dataset");
+data adam.advs (label = "Vital Signs Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 

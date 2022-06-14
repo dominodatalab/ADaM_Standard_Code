@@ -50,7 +50,7 @@ proc sort data=sdtm.ae out=ae;
 run;
 %p_suppadd (inds=ae,domain=AE,outds=aeplus);
 /*Merging ADSL with AE to get Key Variables from ADSL*/
-proc sort data=adamw.adsl out=adsl;
+proc sort data=adam.adsl out=adsl;
         by usubjid;
 run;
 data ae1;
@@ -178,7 +178,7 @@ data final;
 run;
 
 
-data adamw.adae (label = "Adverse Event Analysis Dataset");
+data adam.adae (label = "Adverse Event Analysis Dataset");
   retain &keepvars.;
   set final (keep = &keepvars.);
 
