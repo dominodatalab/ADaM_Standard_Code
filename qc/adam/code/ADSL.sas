@@ -8,13 +8,13 @@
 * Sponsor              : Domino
 * Study                : H2QMCLZZT
 * Program              : ADSL.SAS
-* Purpose              : To create the ADaM ADSL dataset
+* Purpose              : To create the qc ADaM ADSL dataset
 * ____________________________________________________________________________
 * DESCRIPTION                                                    
 *                                                                   
 * Input files:  SDTM: DM, EX, DS, SV, MH, QS, VS, SC
 *              
-* Output files: ADSL
+* Output files: adamqc.ADSL
 *               
 * Macros:       None
 *         
