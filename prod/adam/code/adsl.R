@@ -225,10 +225,25 @@ add_cumdose <- function(.data, ex_data = ex) {
     left_join(ex_cumdose, by = "USUBJID")
 }
 
+## Derive disc status
+add_disposition_status <- function(.data, ds_dset = ds) {
+  
+  ds_new <- ds %>%
+    filter(DSCAT == "DISPOSITION EVENT") %>%
+    mutate(
+      EOSSTT = if_else(DSDECOD == "COMPLETED", "COMPLETED", "DISCONTINUED")
+    ) %>%
+    select(USUBJID, EOSSTT) %>%
+    distinct
+  
+  .data %>%
+    left_join(ds_new, by="USUBJID")
+}
+
 ## Derive disc reason
 add_disc_reas <- function(.data, ds_dset = ds){
   ds_reas <- ds %>%
-    filter(DSCAT == "DISPOSITION EVENT" & DSDECOD == "COMPLETED") %>%
+    filter(DSCAT == "DISPOSITION EVENT" & DSDECOD != "COMPLETED") %>%
     select(USUBJID, DCSREAS=DSDECOD) %>%
     mutate(
       DCSREAPL = recode(DCSREAS, !!!DCSREAPL_FMT)
@@ -331,13 +346,7 @@ ADSL <- dm %>%
   mutate(TRTEDT = if_else(is.na(LSTEXDT), EOSDT, LSTEXDT),
          TRTDURD = as.numeric(TRTEDT - TRTSDT) + 1) %>%
   # Derive end of study status
-  derive_var_disposition_status(
-    dataset_ds = ds,
-    new_var = EOSSTT,
-    status_var = DSDECOD,
-    format_new_var = format_eoxxstt_default,
-    filter_ds = DSCAT == "DISPOSITON EVENT"
-  ) %>%
+  add_disposition_status %>%
   add_disc_reas %>%
   # randdt
   add_randdt %>%
@@ -410,8 +419,10 @@ ADSL <- dm %>%
   ) %>%
   # End of treatment visit. 
   left_join(
-    filter(ds, DSDECOD == "COMPLETED" & DSCAT == "DISPOSITION EVENT") %>%
-      mutate(VISNUMEN = min(12, VISITNUM)) %>%
+    filter(ds, DSCAT == "DISPOSITION EVENT") %>%
+      group_by(USUBJID) %>%
+      mutate(VISNUMEN = if_else(DSDECOD == "COMPLETED" & VISITNUM == 13, 12, min(12, VISITNUM))) %>%
+      ungroup %>%
       select(USUBJID, VISNUMEN) %>%
       distinct,
     by = "USUBJID"
