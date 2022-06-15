@@ -5,16 +5,18 @@
 #        \ \/(/_| (_|| | |(/_(_|
 #         O
 # ______________________________________________________________________________          
-# Study: Domino Data Lab
-# Analysis:
-# Program:
-# Purpose: Produce eDISH plot from adlbhy for Domino 
+# Sponsor              : Domino
+# Compound             : Xanomeline
+# Study                : H2QMCLZZT
+# Analysis             : PILOT01
+# Program              : eDISH.R
+# Purpose              : Produce eDISH plot from adlbhy for Domino 
 #_______________________________________________________________________________                            
 # DESCRIPTION
 #                           
 # Input files: adlbhy.sas7bdat
 #                             
-# Output files: 
+# Output files: edish.pdf
 #                             
 # Utility functions:
 # 
