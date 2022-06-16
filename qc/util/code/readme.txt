@@ -1,1 +1,1 @@
-file to fill empty folder for Git Storage
+Folder to contain all QC side utility programs.
