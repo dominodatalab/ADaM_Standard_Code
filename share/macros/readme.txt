@@ -1,0 +1,1 @@
+Folder to contain all macros to be automatically loaded into programs.
