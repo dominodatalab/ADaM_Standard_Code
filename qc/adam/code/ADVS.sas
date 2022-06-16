@@ -42,7 +42,7 @@
 * Get variables from ADSL;
 data adsl (keep = studyid usubjid subjid siteid trt01a trt01an trtsdt rename = (trt01a = trta trt01an = trtan));
   set adamqc.adsl;
-run;a
+run;
 
 * Get vital sign data;
 data vs (keep = usubjid vsstat vsloc adt visit visitnum avisitn avisit atpt atptn vstestcd vstest vsstresu aval basetype);
