@@ -1,1 +1,3 @@
-Folder to contain all macros to be automatically loaded into programs.
+This folder contains macros that are shared across prod and qc programs.
+Typically these are utility macro - e.g. logscan, etc. that do not process 
+data or create results.
