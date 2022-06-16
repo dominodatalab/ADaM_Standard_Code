@@ -16,13 +16,13 @@
 *              
 * Output files: t_13_01_01_disp_all
 *               
-* Macros: init scanlog
+* Macros: init 
 *         
 * Assumptions: 
 *
 * ____________________________________________________________________________
 * PROGRAM HISTORY                                                         
-*  22MAR2022  | Lindsey Megarry-Jones | Original version
+*  24MAY2022  | Jake Tombeur  | Original version
 * ----------------------------------------------------------------------------
 \*****************************************************************************/
 

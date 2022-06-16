@@ -6,9 +6,9 @@
 * |____/ \___/|_| |_| |_|_|_| |_|\___/
 * ____________________________________________________________________________
 * Sponsor              : Domino
-* Study                : Pilot01
+* Study                : H2QMCLZZT
 * Program              : adae.sas
-* Purpose              : Create ADAE qcdataset
+* Purpose              : Create qc ADAE qcdataset
 * ____________________________________________________________________________
 * DESCRIPTION                                                    
 *                                                                   
@@ -24,9 +24,7 @@
 *                                                                   
 * ____________________________________________________________________________
 * PROGRAM HISTORY                                                         
-*  24MAR2022 |  Srihari Hanumantha  |  Original  
-*  07APR2022 |  Dianne Weatherall   |  Updated u_ macro calls to p_ macro calls 
-*  12APR2022 |  Dianne Weatherall   |  Updated CQ01NAM from equalling text provided to containing text provided  
+*  9JUN2022  | Jake Tombeur  | Original version
 * ---------------------------------------------------------------------------- 
 \*****************************************************************************/
 

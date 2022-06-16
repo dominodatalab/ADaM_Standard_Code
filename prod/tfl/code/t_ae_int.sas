@@ -7,7 +7,7 @@
 * ____________________________________________________________________________
 * Sponsor              : Domino
 * Study                : H2QMCLZZT
-* Program              : t_ae3.SAS
+* Program              : t_ae_int.SAS
 * Purpose              : Create table 14.5.4
 * ____________________________________________________________________________
 * DESCRIPTION                                                    

@@ -1,4 +1,3 @@
-%include "!DOMINO_WORKING_DIR/config/domino.sas";
 /*****************************************************************************\
 *        O                                                                      
 *       /                                                                       
@@ -25,7 +24,7 @@
 * PROGRAM HISTORY                                                         
 *  07JUN2022      | Jake Tombeur     | Original version
 \*****************************************************************************/
-
+%include "!DOMINO_WORKING_DIR/config/domino.sas";
 
 **** USER CODE FOR ALL DATA PROCESSING **;
 

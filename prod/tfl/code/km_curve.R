@@ -5,16 +5,18 @@
 #        \ \/(/_| (_|| | |(/_(_|
 #         O
 # ______________________________________________________________________________          
-# Study: Domino Data Lab
-# Analysis:
-# Program:
-# Purpose: Produce visualisations of the data from ADTTE for stats demo
+# Sponsor              : Domino
+# Compound             : Xanomeline
+# Study                : H2QMCLZZT
+# Analysis             : PILOT01
+# Program              : eDISH.R
+# Purpose              : Produce visualisations of the data from ADTTE
 #_______________________________________________________________________________                            
 # DESCRIPTION
 #                           
 # Input files: adtte.sas7bdat
 #                             
-# Output files: Kaplan Meier curve (put names of plots)
+# Output files: vet_kmcurve_R.pdf
 #                             
 # Utility functions:
 # 
