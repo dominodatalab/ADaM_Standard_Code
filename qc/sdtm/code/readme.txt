@@ -1,1 +1,0 @@
-Folder to contain all QC side SDTM programs.
