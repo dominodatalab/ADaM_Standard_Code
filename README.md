@@ -1,4 +1,4 @@
-# Domino Data Lab ADaM and TFL repository
+# Domino Data Lab ADaM and TFL standard macro repo
 
 This repo contains ADaM and TFL standard macros for the Domino Data Lab clinical demo. 
 
